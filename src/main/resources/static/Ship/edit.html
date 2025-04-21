@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>运输单 -- 編輯</title>
+</head>
+<link rel="stylesheet" type="text/css" href="../../easyUI/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../easyUI/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="../../easyUI/themes/myicon.css">
+<link rel="stylesheet" type="text/css" href="../../easyUI/themes/color.css">
+<link rel="stylesheet" type="text/css" href="../../myCSS/demo.css">
+
+<script type="text/javascript" src="../../easyUI/jquery.js"></script>
+<script type="text/javascript" src="../../easyUI/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../easyUI/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="../../easyUI/extJquery.js"></script>
+<script type="text/javascript" src="../../easyUI/extEasyUI.js"></script>
+<script type="text/javascript" src="../../easyUI/datagrid-groupview.js"></script>
+<script type="text/javascript" src="../../myJs/showMessage.js"></script>
+
+<style>
+  .datagrid-header .datagrid-cell {
+    height: auto;
+    text-align: center;
+  }
+  .datagrid-header-row .datagrid-cell span {
+    white-space: normal !important;
+    word-wrap: normal !important;
+  }
+  #span{
+    float:right;
+    font-weight: bolder;
+    font-family: 'Microsoft YaHei, 微软雅黑';
+    font-size: 16px;
+    color: blue;
+  }
+</style>
+
+<script type="text/javascript">
+  let url=location.search;
+  let Request = new Object();
+  let id ;	// 订单ID
+  if (url.indexOf("?") != -1) {
+    var str = url.substr(1)　//去掉?号
+    strs = str.split("&");
+    for (var i = 0; i < strs.length; i++) {
+      Request[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+    }
+    id = Request["id"];
+  }
+
+  let editrow = 'undefined';
+  let dataGrid;
+
+  function insertARow(index, data) {
+    let dataRows = dataGrid.datagrid('getData').rows;
+    console.info(dataRows);
+    for ( i=0; i<dataRows.length; i++){
+      if (data.id === dataRows[i].outDetailPid){
+        parent.$.messager.show({
+          title:'信息！',
+          msg:'该条出库计划明细数据已经添加',
+          timeout:2000,
+          width:250,
+          height:100,
+          showType:'slide',
+          style:{
+            right:'',
+            top:document.body.scrollTop+document.documentElement.scrollTop,
+            bottom:''
+          }
+        });
+        return;
+      }
+    }
+    dataGrid.datagrid('insertRow',
+            {index:0,
+              row:{'outSno': data.outSno,
+                'outPid': data.outPid,
+                'goodsTypeName': data.goodsTypeName,
+                'goodsName': data.goodsName,
+                'id': data.id,
+                'outDetailNum': data.num,
+                'outDetailAlreadyNum':data.alreadyNum,
+                'outDetailPrice': data.price}
+            });
+
+  }
+
+  $(function() {
+    // 注册dataGrid
+    dataGrid = $('#dg_shipDetail')
+            .datagrid({
+              url : httphost + '/ship/getShipDetails/' + id,
+              pagination : true,
+              fitColumns : true,
+              fit : true,
+              rownumbers : true,
+              //singleSelect : true,
+              border : false,
+              striped : true,
+              idField : 'id',
+              pageList : [10,20,50,100,200 ],
+              groupField: 'outPid',
+              view: groupview,
+              groupFormatter:function(value, rows){
+                //console.info(rows[0]);
+                if ("undefined" !== typeof rows[0].outSno)
+                  return "出库计划单号 ：<font color='blue'>" + rows[0].outSno + ' </font>-- 共：' + rows.length + " 条待出库明细";
+                else
+                  return  "出库计划单号 ：<font color='red'>新增,无单号</font></font>"  + ' -- 共：' + rows.length + " 条待出库明细";
+              },
+              frozenColumns : [ [
+                {
+                  field : 'id',
+                  title : 'ID',
+                  align : 'center',
+                  checkbox: true,
+                  width : 80,
+                }, {
+                  field : 'shipPid',
+                  title : 'shipPid',
+                  align : 'center',
+                  hidden: true,
+                  width : 80,
+                },
+                {
+                  field : 'outPid',
+                  title : '出库计划单号',
+                  width : 140,
+                  align: "center",
+                  hidden: true,
+                }, {
+                  field : 'outSno',
+                  title : '出库计划单号',
+                  align: "center",
+                  width : 100,
+                },
+                {
+                  field : 'goodsName',
+                  title : '图书名称',
+                  width : 100,
+                  align: "center",
+                },
+                {
+                  field : 'goodsTypeName',
+                  title : '图书类别',
+                  width : 80,
+                  align: "center",
+                  sortable : true,
+                },
+              ] ],
+              columns : [ [
+                {
+                  field : 'outDetailNum',
+                  title : '出库数量',
+                  width : 80,
+                  align: "center",
+                  sortable : true,
+                },
+                {
+                  field : 'num',
+                  title : '本次出库数量',
+                  align : 'center',
+                  width : 80,
+                  editor : {
+                    type : 'validatebox',
+                    options : {
+                      required : false,
+                    }
+                  }
+                },
+              ] ],
+              toolbar : '#toolbar',
+
+              onLoadSuccess : function() {
+                parent.$.messager.progress('close');
+
+                $(this).datagrid('tooltip');
+              },
+              onAfterEdit : function(rowIndex, rowData, changes) {
+                //console.info(rowData);
+                afterEdit(rowIndex, rowData, changes);
+              },
+              onDblClickRow: function (index, row){
+                editFun(index);
+              }
+            });
+    afterSuccessLoad();
+    $('#cangPid').combogrid({
+      panelWidth:380,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      singleSelect : true,// 只能单选
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/cang/getCang',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#cangPid').combogrid('grid').datagrid('load', {sname: q});
+          $('#cangPid').combogrid('setValue',q);
+        }
+      },
+      columns:[[
+        {field:'id',title:'ID'},
+        {field:'sno',title:'类别编号',width : 60},
+        {field:'sname',title:'类别名称',align:'center'},
+        {field:'addition',title:'描述',width : 160},
+      ]],
+    })
+    $('#yuanPid').combogrid({
+      panelWidth:380,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      singleSelect : true,// 只能单选
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/yuan/getYuan',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+          $('#yuanPid').combogrid('setValue',q);
+        }
+      },
+      columns:[[
+        {field:'sno',title:'编号',width : 60},
+        {field:'sname',title:'名称',align:'center'},
+        {field:'addition',title:'联系方式',width : 160},
+        {field:'department',title:'部门',width : 160},
+      ]],
+    })
+    $('#addOut').combogrid({
+      panelWidth:480,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/out/getOutDetails',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#addOut').combogrid('grid').datagrid('load', {outSName: q});
+          $('#addOut').combogrid('setValue',q);
+        }
+      },
+      groupField: 'outPid',
+      view: groupview,
+      groupFormatter:function(value, rows){
+        //console.info(rows[0]);
+        if ("undefined" !== typeof rows[0].outSno)
+          return "出库计划单号 ：<font color='blue'>" + rows[0].outSno + ' </font>-- 共：' + rows.length + " 条待出库明细";
+        else
+          return  "出库计划单号 ：<font color='red'>新增,无单号</font></font>"  + ' -- 共：' + rows.length + " 条待出库明细";
+      },
+      columns:[[
+        {field:'id',title:'ID',checkbox:true},
+        {field:'outPid',title:'outPid',hidden:true},
+        {field:'outSno',title:'出库计划单号'},
+        {field:'goodsName',title:'图书名称'},
+        {field:'goodsTypeName',title:'图书类别',align:'center'},
+        {field:'num',title:'计划出库数量'},
+        {field:'alreadyNum',title:'已出库数量'},
+      ]],
+      onCheck:function (index,row){
+        insertARow(index,row);
+      },
+      onUnCheck:function (index,row){
+        removeARow(index,row);
+      }
+    })
+
+    $('#w').window({
+      onBeforeClose: function() {
+        window.close();
+        return false;
+      }
+    })
+  });
+
+  /**
+   * 页面加载完毕后，马上运行此函数，根据是否为新增，进入编辑和新增功能
+   * szy
+   * 2023-3-30
+   */
+  function afterSuccessLoad(){
+    if(id > 0){		// 订单的修改页面
+      //获取单头信息
+      $.ajax({
+        type: "POST",
+        url: httphost + "/ship/getSingleShip",
+        data: {'id':id},
+        success: function (result) {
+          //console.info(result.sno);
+          $('#sno').val(result.sno);
+          $('#supplier').val(result.supplier);
+          $('#cangPid').combogrid('setValue', result.cangPid);
+          $('#yuanPid').combogrid('setValue', result.yuanPid);
+          $('#dueDate').datebox('setValue',result.dueDate);
+          $('#w').window({title:"出库单： -- &nbsp;&nbsp; 修改"}) ;
+        }
+      });
+
+    }else{	// 新增界面
+      $('#w').window({title:"出库单： -- &nbsp;&nbsp; 新增"}) ;
+    }
+  }
+
+  function clearHead(){
+    $('#sno').val('');
+    $('#supplier').val('');
+    $('#cangPid').val('');
+    $('#yuanPid').val('');
+    $('#dueDate').datebox('setValue','');
+  }
+
+  function editFun(index) {
+
+    if (editrow != 'undefined') {
+      dataGrid.datagrid('endEdit', editrow);
+    }
+    dataGrid.datagrid('removeEditor', [ 'id' ]);
+    dataGrid.datagrid('beginEdit', index);
+    editrow = index;
+  }
+
+  function deleteFun( ) {
+    let rows = dataGrid.datagrid('getChecked');
+    //console.info(rows);
+    if (rows.length > 0) {
+      parent.$.messager.confirm('询问', '您是否要删除当前出库计划单明细？', function(b) {
+        if (b) {
+          parent.$.messager.progress({
+            title : '提示',
+            text : '数据处理中，请稍后....'
+          });
+          let ids =[];
+          // 这里必须反过来循环，否则最后一条选中记录不能删除
+          for ( let i = rows.length-1; i >= 0 ; i--){
+            ids.push(rows[i].id);
+            let rowIndex = dataGrid.datagrid('getRowIndex',rows[i])
+            dataGrid.datagrid('deleteRow',rowIndex);
+          }
+
+          // console.info(ids.join(','));
+
+          parent.$.messager.progress('close');
+        }
+      });
+    }else {
+      $.messager.alert('提示','请选择要删除的记录！','error')
+    }
+  }
+
+  function afterEdit(rowIndex, rowData, changes) {
+    editrow = 'undefined'; //开关复位
+  }
+
+  function saveFun() {
+
+    dataGrid.datagrid('endEdit', editrow); //editrow 为本页面的局部变量
+  }
+
+  function addFun() {
+    if (editrow != 'undefined') {
+      dataGrid.datagrid('endEdit', editrow);
+    }
+    if (editrow == 'undefined') {
+      dataGrid.datagrid('insertRow', {
+        index : 0,
+        row : {}
+      });
+      dataGrid.datagrid('beginEdit', 0);
+      editrow = 0;
+    }
+  }
+
+  /**
+   * 提交 保存数据
+   */
+  function submitFun(){
+    let inserted = dataGrid.datagrid('getChanges', 'inserted');
+    let updated = dataGrid.datagrid('getChanges', 'updated');
+    let deleted = dataGrid.datagrid('getChanges', 'deleted');
+
+    if (inserted.length > 0 || updated.length >0 || deleted.length > 0){
+      parent.$.messager.confirm('询问', '您是否要新增当前出库单？', function(b) {
+        if (b) {
+          parent.$.messager.progress({
+            title: '提示',
+            text: '数据处理中，请稍后....'
+          });
+          let shipDto = {
+            'id' : id,
+            'sno' : $('#sno').val(),
+            'supplier' : $('#supplier').val(),
+            'addition' : $('#addition').val(),
+            'cangPid' : $('#cangPid').val(),
+            'yuanPid' : $('#yuanPid').val(),
+            'dueDate' : $('#dueDate').datebox('getValue'),
+            'inserted': JSON.stringify(inserted),
+            'updated' : JSON.stringify(updated),
+            'deleted' : JSON.stringify(deleted),
+          };
+          //console.info(outDto);
+          $.ajax({
+            type : "POST",
+            url : '/ship/edit',
+            data : shipDto, //JSON.stringify(outDto),
+            //	contentType: "application/json; charset=utf-8",
+            dataType : 'json',
+            success : function(r) {
+              if (r && r.success) {
+                /*parent.$.messager.alert('数据更新', r.msg); //easyui中的控件messager
+                dataGrid.datagrid('reload');
+                clearHead()*/
+                alert(r.msg);
+                window.close();
+
+                /*id = r.id;
+                dataGrid.datagrid({url:httphost + '/out/getOutDetails/' + id});*/
+              } else {
+                parent.$.messager.alert('数据更新或插入', r.msg, 'error'); //easyui中的控件messager
+                dataGrid.datagrid('rejectChanges');
+              }
+            }
+          });
+
+
+        }
+      })
+    }
+  }
+
+
+</script>
+<body>
+
+<div id="w" class="easyui-window" title="出库单 " data-options="iconCls:'icon-save'" style="width:1000px;height:700px;padding:5px;">
+  <div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',split:true" style="height:100px" >
+      <form id="fm_out">
+        <table style="padding:10px 0 0 0;">
+          <tr><td>出库单号：</td><td><input id="sno" name="sno" readonly></td>
+            <td>收件人：</td><td><input id="supplier" name="supplier" ></td>
+            <td>送货地址：</td><td><input id="cangPid" name="cangPid" ></td>
+          </tr>
+          <tr> <td>发件人</td><td><input id="yuanPid" name="yuanPid" ></td>
+            <td>预计送达日期：</td><td><input id="dueDate" name="dueDate" class="easyui-datebox" ></td>
+          </tr>
+        </table>
+        <div style="text-align:right;padding:2px 0 2px;">
+          <span style="float:left">增加出库单：<input id="addOut",name="addOut"></span>
+          <!--<a class="easyui-linkbutton" data-options="iconCls:'icon-add'" href="javascript:void(0)" onclick="addFun()" style="width:90px">新增一行</a>-->
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0)" onclick="saveFun();" style="width:90px">暂存</a>
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-remove'" href="javascript:void(0)" onclick="deleteFun();" style="width:90px">删除选中</a>
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-reload'" href="javascript:void(0)" onclick="dataGrid.datagrid('reload');" style="width:90px">刷新</a>
+        </div>
+      </form>
+    </div>
+    <div data-options="region:'center'" style="padding:0 0 35px 0;">
+      <div id="dg_shipDetail"/>
+    </div>
+    <div data-options="region:'south'" style="text-align:right;padding:5px 0 0;">
+      <a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="submitFun();" style="width:80px">Ok</a>
+      <a class="easyui-linkbutton" data-options="iconCls:'transmit'" href="javascript:void(0)" onclick="window.close();" style="width:80px">Cancel</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

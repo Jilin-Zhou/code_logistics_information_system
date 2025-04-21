@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>图书数据</title>
+</head>
+<link rel="stylesheet" type="text/css" href="easyUI/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyUI/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="easyUI/themes/myicon.css">
+<link rel="stylesheet" type="text/css" href="easyUI/themes/color.css">
+<link rel="stylesheet" type="text/css" href="myCSS/demo.css">
+
+<script type="text/javascript" src="easyUI/jquery.js"></script>
+<script type="text/javascript" src="easyUI/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="easyUI/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="easyUI/extJquery.js"></script>
+<script type="text/javascript" src="easyUI/extEasyUI.js"></script>
+<script type="text/javascript" src="myJs/showMessage.js"></script>
+
+<style>
+    .datagrid-header-row .datagrid-cell span {
+        white-space: normal !important;
+        word-wrap: normal !important;
+    }
+</style>
+<script type="text/javascript">
+    let dataGrid;
+
+    $(function() {
+        $('#dataGrid').pagination({
+            total:2000,
+            pageSize:30
+        });
+
+        editrow = 'undefined'; //行编辑开关
+        dataGrid = $('#dataGrid')
+            .datagrid(
+                {
+                    url : httphost + '/goods/getGoods',
+                    pagination : true,
+                    fitColumns : true,
+                    fit : true,
+                    rownumbers : true,// 显示行号
+                    singleSelect : true,// 只能单选
+                    border : false,
+                    striped : true,// 隔行变色
+                    idField : 'id', // 主键字段
+                    pageList : [ 30, 50, 100, 1000, 2000 ],
+                    frozenColumns : [ [ {
+                        field : 'id',
+                        title : 'ID',
+                        align : 'center',
+                        hidden: true,
+                        width : 50,
+                    }, {
+                        field : 'sno',
+                        title : '图书编码',
+                        width : 70,
+                        sortable : true,
+                        editor : {
+                            type : 'validatebox',
+                            options : {
+                                required : false
+                            }
+                        }
+                    } ] ],
+                    columns : [ [
+                        {
+                            field : 'sname',
+                            title : '图书名称',
+                            sortable : true,
+                            width : 160,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : true,
+                                }
+                            }
+                        },
+                        {
+                            field : 'goodsTypePid',
+                            title : '图书类别',
+                            sortable : true,
+                            width : 60,
+                            formatter: function(value, row, index) {
+                                return row.goodType;
+                            },
+                            editor : {type : 'combogrid',options : {required : false,
+                                    panelWidth:380,
+                                    panelHeight:450,
+                                    idField : 'id',
+                                    textField : 'sname',
+                                    pagination : true,
+                                    fitColumns : true,
+                                    fit : true,
+                                    rownumbers : true,// 显示行号
+                                    singleSelect : true,// 只能单选
+                                    border : false,
+                                    striped : true,// 隔行变色
+                                    url: httphost + '/goodsType/getGoodsType',
+                                    pageList : [15,30,50],
+                                    delay: 500,
+                                    keyHandler: $.extend($.fn.combo.defaults.keyHandler, {
+                                        query: function (q) {
+                                            $('#comboGrid-editor').combogrid('grid').datagrid('load', {sname: q});
+                                            $('#comboGrid-editor').combogrid('setValue',q);
+                                        }
+                                    }) ,
+                                    columns:[[
+                                        {field:'id',title:'ID'},
+                                        {field:'sno',title:'类别编号',width : 60},
+                                        {field:'sname',title:'类别名称',align:'center'},
+                                    ]],
+                                    onLoadSuccess: function (){
+
+                                    }
+                                } }
+                        },{
+                            field : 'manufacturer',
+                            title : '生产商',
+                            width : 60,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false,
+                                }
+                            }
+                        },
+                        {
+                            field : 'num',
+                            title : '在库数量',
+                            width : 120,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false,
+                                }
+                            }
+                        },
+                        {
+                            field : 'jprice',
+                            title : '进价',
+                            width : 120,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false,
+                                }
+                            }
+                        },
+                        {
+                            field : 'sprice',
+                            title : '售价',
+                            width : 120,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false,
+                                }
+                            }
+                        },
+                        {
+                            field : 'picurl',
+                            title: '预览图',
+                            width : 150,
+                            formatter:function (value, row, index) {
+                              if(value){
+                                  return `<img src="${value}"
+                                            alt="预览图"
+                                            style="max-width: 150px; max-height: 150px; vertical-align: middle;"
+                                            onerror="this.onerror=null;this.src='easyUI/themes/extjs_icons/error.png';"/>`;
+                              }else{
+                                  return '<span style="color:#999;">无预览图</span>';
+                                  
+                              }
+                            },
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false,
+                                }
+                            }
+                        },
+                        {
+                            field : 'actor',
+                            title : '操作',
+                            width : 70,
+                            formatter : function(value, row, index) {
+                                var str = '';
+                                str += $
+                                    .formatString(
+                                        '<img onclick="editFun(\'{0}\');" src="{1}" title="编辑"/>',
+                                        index,
+                                        'easyUI/themes/extjs_icons/pencil.png');
+                                //
+                                // // 注销删除按钮
+                                str += '&nbsp;&nbsp;';
+                                str += $.formatString('<img onclick="deleteFun(\'{0}\');" src="{1}" title="删除"/>', index, 'easyUI/themes/extjs_icons/cancel.png');
+
+                                return str;
+                            }
+                        } ] ],
+                    toolbar : '#toolbar',
+
+                    onLoadSuccess : function() {
+                        parent.$.messager.progress('close');
+
+                        $(this).datagrid('tooltip');
+                    },
+                    onAfterEdit : function(rowIndex, rowData, changes) {
+                        //console.info(rowData);
+                        afterEdit(rowIndex, rowData, changes);
+                    }
+                });
+        $('.datagrid-header div').css('textAlign','center');
+
+        $('#goodsTypePid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/goodsType/getGoodsType',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#goodsTypePid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#goodsTypePid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'id',title:'ID'},
+                {field:'sno',title:'类别编号',width : 60},
+                {field:'sname',title:'类别名称',align:'center'},
+            ]],
+        })
+    });
+
+
+    function afterEdit(rowIndex, rowData, changes) {
+        var inserted = dataGrid.datagrid('getChanges', 'inserted');
+        var updated = dataGrid.datagrid('getChanges', 'updated');
+        var url = "";
+        var data = {};
+        if (inserted.length > 0) {
+            url = "/goods/add";
+            data = inserted[0];
+        }
+        if (updated.length > 0) {
+            url = "/goods/edit";
+            data = updated[0];
+        }
+        if (url.length < 1)
+            return;
+        //console.info(url);
+        $.ajax({
+            type : "POST",
+            url : url,
+            data : data,
+            dataType : 'json',
+            success : function(r) {
+                if (r && r.success) {
+                    parent.$.messager.alert('数据更新', r.msg); //easyui中的控件messager
+                    dataGrid.datagrid('acceptChanges');
+                    dataGrid.datagrid('reload');
+                } else {
+                    parent.$.messager.alert('数据更新或插入', r.msg, 'error'); //easyui中的控件messager
+                    dataGrid.datagrid('rejectChanges');
+                }
+            }
+        });
+        editrow = 'undefined'; //开关复位
+    }
+
+    function deleteFun(id) {
+        //console.info(id);
+        if (id != undefined) {
+            dataGrid.datagrid('selectRow', id);
+        }
+        var rows = dataGrid.datagrid('getSelections');
+        //console.info(rows);
+        if (rows.length > 0) {
+            parent.$.messager.confirm('询问', '您是否要删除当前图书？', function(b) {
+                if (b) {
+                    parent.$.messager.progress({
+                        title : '提示',
+                        text : '数据处理中，请稍后....'
+                    });
+                    $.post('/goods/del', {
+                        id : rows[0].id
+                    }, function(result) {
+                        if (result.success) {
+                            parent.$.messager.alert('提示', result.msg, 'info');
+                            dataGrid.datagrid('reload');
+                        } else
+                            parent.$.messager.alert('提示', result.msg, 'error');
+                        parent.$.messager.progress('close');
+                    }, 'JSON');
+                }
+            });
+        }
+    }
+
+    function editFun(index) {
+        if (editrow != 'undefined') {
+            dataGrid.datagrid('endEdit', editrow);
+        }
+        dataGrid.datagrid('removeEditor', [ 'id' ]);
+        //let editRow = dataGrid.datagrid('getData').rows[index];
+        // console.info(editRow);
+
+        dataGrid.datagrid('beginEdit', index);
+        editrow = index;
+    }
+
+    function addFun() {
+        if (editrow != 'undefined') {
+            dataGrid.datagrid('endEdit', editrow);
+        }
+        if (editrow == 'undefined') {
+            dataGrid.datagrid('insertRow', {
+                index : 0,
+                row : {}
+            });
+            dataGrid.datagrid('beginEdit', 0);
+            editrow = 0;
+        }
+    }
+
+
+    function saveFun() {
+        dataGrid.datagrid('endEdit', editrow); //editrow 为本页面的局部变量
+    }
+
+    function cancelFun() {
+        editrow = 'undefined'; //开关复位
+        dataGrid.datagrid('rejectChanges');
+        dataGrid.datagrid('unselectAll');
+    }
+    $.extend($.fn.validatebox.defaults.rules, {
+        myvalid: {
+            validator: function (value, param) {
+                //return /^[A-F\d]{5}$/.test(value)//其他长度注意改正则,只能输入A-F或数字且长度为5！
+                return /^[\d]{2,4}$/.test(value)   //验证1-999之间的所有正整数
+            },
+            message: '只能输入10-9999之间的正整数！'
+        }
+    });
+
+    function doSearch() {
+        // 取得查询条件，发送给后台
+        //console.info($('#station').combobox('getValue'));
+        $('#dataGrid').datagrid('load', {
+            // 参数名与后台pojo属性名一致即可自动填充
+            // 'canID' : $('#canID').combobox('getValue'),
+            'sno' : $('#sno').val(),
+            'sname' : $('#sname').val(),
+            'goodsTypePid' : $('#goodsTypePid').combogrid('getValue'),
+            // 'size' : $('#size').val(),
+            'addition' : $('#addition').val(),
+            'manufacturer' : $('#manufacturer').val(),
+        });
+    }
+
+    function clearSearch() {
+        $('#dataGrid').datagrid('load', {});
+        $('#sno').val('');
+        $('#sname').val('');
+        $('#goodsTypePid').combogrid('setValue','');
+        $('#addition').val('');
+        $('#size').val('');
+        $('#yxqz').val('');
+        $('#manufacturer').val('');
+    }
+</script>
+</head>
+<body>
+<div class="easyui-layout" data-options="fit:true,border:false">
+    <div data-options="region:'center',border:false" title=""
+         style="overflow: hidden;">
+        <table id="dataGrid"></table>
+    </div>
+</div>
+<div id="toolbar" style="display: none;">
+    <a onclick="addFun();" href="javascript:void(0);"
+       class="easyui-linkbutton"
+       data-options="plain:true,iconCls:'pencil_add'">添加</a> <a
+        onclick="cancelFun();" href="javascript:void(0);"
+        class="easyui-linkbutton"
+        data-options="plain:true,iconCls:'icon-redo'">撤销</a> <a
+        onclick="saveFun();" href="javascript:void(0);"
+        class="easyui-linkbutton"
+        data-options="plain:true,iconCls:'icon-save'">保存</a> <a
+        onclick="dataGrid.datagrid('reload');" href="javascript:void(0);"
+        class="easyui-linkbutton"
+        data-options="plain:true,iconCls:'transmit'">刷新</a>
+<!--    <a	onclick="exportExcel();" href="javascript:void(0);"-->
+<!--          class="easyui-linkbutton"-->
+<!--          data-options="plain:true,iconCls:'export_excel'">导出Excel</a>-->
+
+    <div  style="border: 3px ;height:60px ;overflow:hidden">
+        <form>
+            <table>
+                <tr>
+                    <td>图书编号：</td><td><input id="sno" name="sno" ></td>
+                    <td>图书名称：</td><td><input id="sname" name="sname" ></td>
+                    <td>图书类别：</td><td><input id="goodsTypePid" name="goodsTypePid" ></td>
+
+                    <td><a href="javascript:void(0)" class="easyui-linkbutton"
+                           plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;
+                        <a href="javascript:void(0)" class="easyui-linkbutton"
+                           plain="false" onclick="clearSearch()" iconCls="icon-redo">清空</a>&nbsp;&nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>生产商：</td><td><input id="manufacturer" name="manufacturer" ></td>
+                </tr>
+
+            </table>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

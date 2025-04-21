@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网上图书商城</title>
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 导航栏样式 */
+        .navbar {
+            background-color: #333;
+            padding: 15px 0;
+            color: white;
+        }
+
+        .navbar .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        /* 表单样式 */
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* 主页图书展示样式 */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 0;
+        }
+
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 200px;
+            background-color: #ddd;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .book-price {
+            color: #e44d26;
+            font-weight: bold;
+        }
+
+        .form-switch {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .form-switch a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+
+        .error-message {
+            color: #ff0000;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .success-message {
+            color: #4CAF50;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .password-requirements {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .requirement {
+            margin-bottom: 3px;
+        }
+
+        .requirement.valid {
+            color: #4CAF50;
+        }
+
+        .form-group input.invalid {
+            border-color: #ff0000;
+        }
+
+        /* 搜索栏样式 */
+        .header-container {
+            background-color: #fff;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            width: 400px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+        }
+
+        .search-button {
+            padding: 8px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+
+        /* 分类导航样式 */
+        .category-nav {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .category-list {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            list-style: none;
+            padding: 0 20px;
+            overflow-x: auto;
+        }
+
+        .category-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .category-item:hover {
+            color: #4CAF50;
+        }
+
+        .category-item.active {
+            color: #4CAF50;
+        }
+
+        .category-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #4CAF50;
+        }
+
+        /* 购物车样式 */
+        .cart-container {
+            position: relative;
+            margin-left: 20px;
+        }
+
+        .cart-icon {
+            font-size: 24px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+        }
+
+        .cart-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 300px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            padding: 15px;
+            display: none;
+        }
+
+        .cart-container:hover .cart-dropdown {
+            display: block;
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item-info {
+            flex: 1;
+            padding: 0 10px;
+        }
+
+        .cart-item-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #ff4444;
+        }
+
+        .cart-item-remove {
+            color: #999;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            font-weight: bold;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* 图书展示样式优化 */
+        .books-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .books-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sort-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 200px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .book-author {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .book-price {
+            color: #ff4444;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .add-to-cart-btn {
+            width: 100%;
+            padding: 8px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .add-to-cart-btn:hover {
+            background-color: #45a049;
+        }
+
+        /* 登录按钮样式 */
+        .login-button {
+            padding: 5px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s ease;
+        }
+        .login-button:hover {
+            background-color: #45a049;
+        }
+
+        /* 退出按钮样式 */
+        .logout-button {
+            padding: 5px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background-color 0.3s ease;
+        }
+        .logout-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<script type="text/javascript" src="../../easyUI/jquery.js"></script>
+<script type="text/javascript" src="../../easyUI/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../easyUI/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="../../easyUI/extJquery.js"></script>
+<script type="text/javascript" src="../../easyUI/extEasyUI.js"></script>
+<script type="text/javascript" src="../../myJs/showMessage.js"></script>
+
+<body>
+<!-- 头部搜索和购物车 -->
+<header class="header-container">
+    <div class="header-content">
+        <div class="logo">图书商城</div>
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="搜索图书...">
+            <button class="search-button">搜索</button>
+        </div>
+
+        <!-- 登录/用户信息区域 -->
+        <div class="user-info" id="user-info">
+            <button class="login-button submit-btn" id="login-button" onclick="login()">登录</button>
+        </div>
+
+        <div class="cart-container">
+            <div class="cart-icon">🛒
+                <span class="cart-count">0</span>
+            </div>
+            <div class="cart-dropdown">
+                <div class="cart-items">
+                    <!-- 购物车内容将通过JavaScript动态添加 -->
+                </div>
+                <div class="cart-total">
+                    <span>总计:</span>
+                    <span class="total-amount">￥0.00</span>
+                </div>
+                <button class="checkout-btn" onclick="addPlans()">去结算</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- 分类导航 -->
+<nav class="category-nav">
+    <ul class="category-list">
+        <li class="category-item active" data-category="all">全部</li>
+        <li class="category-item" data-category="2">文学</li>
+        <li class="category-item" data-category="1">计算机</li>
+        <li class="category-item" data-category="3">经济管理</li>
+        <li class="category-item" data-category="4">少儿读物</li>
+        <li class="category-item" data-category="5">艺术设计</li>
+        <li class="category-item" data-category="6">科学技术</li>
+        <li class="category-item" data-category="7">生活健康</li>
+    </ul>
+</nav>
+
+<!-- 主要内容区域 -->
+<main class="books-container">
+    <div class="books-header">
+        <h2>图书列表</h2>
+        <select class="sort-select">
+            <option value="default">默认排序</option>
+            <option value="price-asc">价格从低到高</option>
+            <option value="price-desc">价格从高到低</option>
+            <option value="sales">销量优先</option>
+        </select>
+    </div>
+    <div class="books-grid">
+        <!-- 图书卡片将通过JavaScript动态添加 -->
+    </div>
+</main>
+
+<script>
+    // 声明全局变量
+    let books = [];  // 图书数据
+    let cart = { items: [], total: 0 };  // 购物车数据
+    let isLoggedIn = false;  // 登录状态
+    let username = null;  // 用户名
+
+    // 页面初始化函数
+    async function init() {
+        await checkLoginStatus();  // 检查登录状态
+        await loadBooks();  // 加载图书数据
+        displayBooks();  // 显示图书列表
+        updateCart();  // 更新购物车
+    }
+
+    // 检查登录状态
+    async function checkLoginStatus() {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            isLoggedIn = true;
+            username = storedUsername;
+            updateUserInfo();
+        } else {
+            isLoggedIn = false;
+            username = null;
+            updateUserInfo();
+        }
+    }
+
+    // 退出登录
+    function logout() {
+        localStorage.removeItem('username');  // 清除本地存储的用户名
+        isLoggedIn = false;  // 更新登录状态
+        username = null;  // 清除用户名
+        updateUserInfo();  // 更新用户信息显示
+        window.location.reload();  // 刷新页面
+    }
+
+    // 更新用户信息显示
+    function updateUserInfo() {
+        const userInfoDiv = document.getElementById('user-info');
+        userInfoDiv.innerHTML = '';  // 清空原有内容
+
+        if (isLoggedIn) {
+            // 如果已登录，显示用户名和退出按钮
+            const usernameSpan = document.createElement('span');
+            usernameSpan.textContent = `欢迎您，${username}！`;
+            userInfoDiv.appendChild(usernameSpan);
+
+            const logoutButton = document.createElement('button');
+            logoutButton.textContent = '退出';
+            logoutButton.classList.add('logout-button');
+            logoutButton.onclick = logout;
+            userInfoDiv.appendChild(logoutButton);
+        } else {
+            // 如果未登录，显示登录按钮
+            const loginButton = document.createElement('button');
+            loginButton.textContent = '登录';
+            loginButton.classList.add('login-button');
+            loginButton.onclick = () => {
+                window.location.href = 'http://localhost:8888/login.html';
+            };
+            userInfoDiv.appendChild(loginButton);
+        }
+    }
+
+    // 加载图书数据
+    async function loadBooks() {
+        try {
+            const response = await fetch('http://localhost:8888/goods/getGoodsList?page=0&rows=10');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            books = await response.json();
+
+        } catch (error) {
+            console.error('加载图书数据失败:', error);
+            alert('加载图书数据失败，请稍后重试！');  // 提示用户
+        }
+    }
+
+    // 显示图书列表
+    function displayBooks(booksToShow = books) {
+        const booksGrid = document.querySelector('.books-grid');
+        booksGrid.innerHTML = booksToShow.map(book => `
+            <div class="book-card" data-category="${book.goodsTypePid}">
+<!--                <div class="book-cover"></div>-->
+                <img src="${book.picurl}" class="book-cover" alt="${book.sname}">
+                <div class="book-title">${book.sname}</div>
+                <div class="book-manufacturer">${book.manufacturer}</div>
+                <div class="book-price">￥${book.sprice}</div>
+                <button class="add-to-cart-btn" onclick="addToCart(${book.id})">加入购物车</button>
+            </div>
+        `).join('');
+    }
+
+    function getCategoryName(goodsTypePid) {
+        switch (goodsTypePid) {
+            case 2:
+                return '文学类';
+            case 1:
+                return '计算机类';
+            case 3:
+                return '经济管理';
+            case 4:
+                return '少儿读物';
+            case 5:
+                return '艺术设计';
+            case 6:
+                return '科学技术';
+            case 7:
+                return '生活健康';
+        }
+    }
+
+    // 添加到购物车
+    function addToCart(bookId) {
+        const book = books.find(b => b.id === bookId);
+        if (book) {
+            const cartItem = cart.items.find(item => item.id === bookId);
+            if (cartItem) {
+                cartItem.quantity++;
+            } else {
+                cart.items.push({ ...book, quantity: 1 });
+            }
+            updateCart();
+        }
+    }
+
+    // 更新购物车显示
+    function updateCart() {
+        const cartItems = document.querySelector('.cart-items');
+        const cartCount = document.querySelector('.cart-count');
+        const totalAmount = document.querySelector('.total-amount');
+
+        // 更新购物车数量
+        cart.total = cart.items.reduce((sum, item) => sum + item.sprice * item.quantity, 0);
+        cartCount.textContent = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+        // 更新购物车列表
+        cartItems.innerHTML = cart.items.map(item => `
+            <div class="cart-item">
+                <div class="cart-item-info">
+                    <div class="cart-item-title">${item.sname}</div>
+                    <div class="cart-item-price">￥${item.sprice} × ${item.quantity}</div>
+                </div>
+                <div class="cart-item-remove" onclick="removeFromCart(${item.id})">×</div>
+            </div>
+        `).join('');
+
+        // 更新总金额
+        totalAmount.textContent = `￥${cart.total.toFixed(2)}`;
+    }
+
+    // 从购物车移除
+    function removeFromCart(bookId) {
+        cart.items = cart.items.filter(item => item.id !== bookId);
+        updateCart();
+    }
+
+    // function proceedToCheckout() {
+    //     if (!isLoggedIn) {
+    //         alert('请先登录再进行结算！');
+    //         window.location.href = 'http://localhost:8888/login.html';
+    //         return;
+    //     }
+    //     if (cart.items.length === 0) {
+    //         alert('购物车是空的，请先添加商品！');
+    //         return;
+    //     }
+    //     // Prepare data to transfer
+    //     const checkoutData = {
+    //         user: {
+    //             username: username // Pass the username
+    //             // Potentially add user ID if available and needed
+    //         },
+    //         cart: cart.items.map(item => ({ // Map to required fields for add.html
+    //             // goodsPid: item.id,          // Product ID
+    //             goodsTypeName:getCategoryName(item.goodsTypePid),
+    //             goodsName: item.sname,      // Product Name
+    //             price: item.sprice,         // Price per item
+    //             num: item.quantity,       // Quantity
+    //         }))
+    //     };
+    //
+    //     try {
+    //         sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+    //         console.log('Checkout data stored in sessionStorage:', checkoutData);
+    //
+    //         window.location.href = 'sale/cus_add.html';
+    //     } catch (e) {
+    //         console.error("Error storing checkout data in sessionStorage:", e);
+    //         alert('结算时发生错误，请稍后重试。');
+    //     }
+    // }
+
+    // 分类切换
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', () => {
+            // 更新激活状态
+            document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+            item.classList.add('active');
+            // 筛选图书
+            const category = item.dataset.category;
+            let filteredBooks;
+            if (category === 'all') {
+                filteredBooks = books;
+            } else {
+                filteredBooks = books.filter(book => book.goodsTypePid === parseInt(category, 10));
+            }
+            if (!Array.isArray(filteredBooks)) { // 检查 filteredBooks 是否是数组
+                console.error("filteredBooks 不是一个数组！");
+                filteredBooks = []; // 如果不是数组，则将其设置为空数组，避免出错
+            }
+            displayBooks(filteredBooks);
+        });
+    });
+
+    // 搜索功能
+    document.querySelector('.search-button').addEventListener('click', () => {
+        const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+        if (searchTerm) {
+            const searchResults = books.filter(book =>
+                book.title.toLowerCase().includes(searchTerm)
+                // book.author.toLowerCase().includes(searchTerm)
+            );
+            displayBooks(searchResults);
+        } else {
+            displayBooks();
+        }
+    });
+
+    // 排序功能
+    document.querySelector('.sort-select').addEventListener('change', (e) => {
+        const sortType = e.target.value;
+        let sortedBooks = [...books];
+
+        switch (sortType) {
+            case 'price-asc':
+                sortedBooks.sort((a, b) => a.sprice - b.sprice);
+                break;
+            case 'price-desc':
+                sortedBooks.sort((a, b) => b.sprice - a.sprice);
+                break;
+            case 'sales':
+                // 这里需要添加销量数据(想写再写吧)
+                break;
+            default:
+                // 默认排序,按ID大小排列
+                sortedBooks.sort((a, b) => a.id - b.id);
+        }
+
+        displayBooks(sortedBooks);
+    });
+
+    function login() {
+        window.location.href = 'http://localhost:8888/login.html';
+    }
+
+    function addPlans(){
+        if (!isLoggedIn) {
+            alert('请先登录再进行结算！');
+            window.location.href = 'http://localhost:8888/login.html';
+            return;
+        }
+
+        if (cart.items.length === 0) {
+            alert('购物车是空的，请先添加商品！');
+            return;
+        }
+
+        // 准备要传递的数据
+        const checkoutData = {
+            username: username,
+            cartItems: cart.items.map(item => ({
+                id: item.id,
+                goodsName: item.sname,
+                goodsTypeName: getCategoryName(item.goodsTypePid),
+                price: item.sprice,
+                num: item.quantity
+            }))
+        };
+
+        // 将数据存储在localStorage中
+        localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+
+        // 跳转到订单页面
+        url = 'Sale/cus_add.html';
+        param = {"id": '-1'};
+        open_page(url, param);
+    }
+
+    // 页面加载时初始化
+    window.addEventListener('load', init);
+</script>
+</body>
+</html>

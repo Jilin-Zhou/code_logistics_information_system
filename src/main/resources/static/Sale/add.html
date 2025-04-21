@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>销售订单 -- 新增</title>
+</head>
+<link rel="stylesheet" type="text/css" href="/easyUI/themes/default/easyui.css">
+<link rel="stylesheet" type="text/css" href="/easyUI/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="/easyUI/themes/myicon.css">
+<link rel="stylesheet" type="text/css" href="/easyUI/themes/color.css">
+<link rel="stylesheet" type="text/css" href="/myCSS/demo.css">
+
+<script type="text/javascript" src="/easyUI/jquery.js"></script>
+<script type="text/javascript" src="/easyUI/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="/easyUI/locale/easyui-lang-zh_CN.js"></script>
+
+<script type="text/javascript" src="/easyUI/extJquery.js"></script>
+<script type="text/javascript" src="/easyUI/extEasyUI.js"></script>
+<script type="text/javascript" src="/myJs/showMessage.js"></script>
+<script type="text/javascript">
+  let url=location.search;
+  let Request = new Object();
+  let id ;	// 订单ID
+  if (url.indexOf("?") != -1) {
+    var str = url.substr(1)　//去掉?号
+    strs = str.split("&");
+    for (var i = 0; i < strs.length; i++) {
+      Request[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+    }
+    id = Request["id"];
+  }
+
+  let editrow = 'undefined';
+  let dataGrid;
+
+  $(function() {
+    getSerial();
+    // 注册dataGrid
+    dataGrid = $('#dg_saleDetail')
+            .datagrid({
+              url : httphost + '/sale/getSaleDetails/' + id,
+              pagination : true,
+              fitColumns : true,
+              fit : true,
+              rownumbers : true,
+              border : false,
+              striped : true,
+              idField : 'id',
+              pageSize : 20,
+              pageList : [10,20,50,100,200 ],
+              frozenColumns : [ [
+                {
+                  field : 'id',
+                  title : 'ID',
+                  align : 'center',
+                  checkbox: true,
+                  width : 80,
+                }, {
+                  field : 'salePid',
+                  title : 'salePid',
+                  align : 'center',
+                  hidden: true,
+                  width : 80,
+                },
+                {
+                  field : 'goodsPid',
+                  title : '图书名称',
+                  width : 140,
+                  align: "center",
+                  formatter: function(value, row, index) {
+                    return row.goodsName;
+                  },
+                  editor : {type : 'combogrid',options : {required : false,
+                      panelWidth:380,
+                      panelHeight:450,
+                      idField : 'id',
+                      textField : 'sname',
+                      pagination : true,
+                      fitColumns : true,
+                      fit : true,
+                      rownumbers : true,// 显示行号
+                      singleSelect : true,// 只能单选
+                      border : false,
+                      striped : true,// 隔行变色
+                      url: httphost + '/goods/getGoods',
+                      pageList : [15,30,50],
+                      keyHandler:{
+                        query: function (q) {
+                          $('#comboGrid-editor').combogrid('grid').datagrid('load', {sname: q});
+                          $('#comboGrid-editor').combogrid('setValue',q);
+                        }
+                      } ,
+                      columns:[[
+                        {field:'id',title:'ID'},
+                        {field:'sno',title:'图书编号',width : 60},
+                        {field:'sname',title:'图书名称',align:'center'},
+                        {field:'goodType',title:'图书类别',width : 160},
+                      ]],
+                      onSelect: function(row, rowData){
+                        //rowData.hmNo=rowData.hmNo+rowData.tpcNo;
+                        //rowData.tpcNo=rowData.hmNo+rowData.tpcNo;
+                        var rowIndex= editrow; //dataGrid.datagrid('getRowIndex',dataGrid.datagrid('getSelected'));
+                        dataGrid.datagrid('beginEdit', rowIndex);
+                        let editors = dataGrid.datagrid('getEditors', rowIndex);
+                        // console.info(editors);
+                        let goodType = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsTypeName' });
+                        /*	ed.target.textbox('setValue',rowData.USERNAME);//textbox赋值方法
+                            $(ed.target).val(rowData.USERNAME);//text赋值方法*/
+                        // console.info(goodType);
+                        $(goodType.target).val(rowData.goodType);
+                        let goodsName = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsName' });
+                        $(goodsName.target).val(rowData.sname);
+                        // let color = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'color' });
+                        // $(color.target).val(rowData.addition);
+                        // let size = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'size' });
+                        // $(size.target).val(rowData.size);
+                        let price = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'price'});
+                        $(price.target).val(rowData.sprice);
+                      }
+                    } },
+
+                }, {
+                  field : 'goodsName',
+                  title : '图书名称',
+                  width : 140,
+                  align: "center",
+                  hidden: true,
+                  //sortable : true,
+                  editor: {
+                    type: 'text',
+                  }
+                },
+                {
+                  field : 'goodsTypeName',
+                  title : '图书类别',
+                  width : 140,
+                  align: "center",
+                  sortable : true,
+                  editor: {
+                    type: 'text',
+                  }
+                },
+              ] ],
+              columns : [ [
+                {
+                  field : 'num',
+                  title : '销售数量',
+                  width : 110,
+                  align: "center",
+                  sortable : true,
+                  editor : {
+                    type : 'validatebox',
+                    options : {
+                      required : false,
+                    }
+                  }
+                },{
+                  field : 'price',
+                  title : '销售价格',
+                  align : 'center',
+                  width : 160,
+                  editor : {
+                    type : 'validatebox',
+                    options : {
+                      required : false,
+                    }
+                  }
+                } ,
+                {
+                  field : 'alreadyNum',
+                  title : '已销售数量',
+                  align : 'center',
+                  width : 160,
+                } ,
+
+              ] ],
+              toolbar : '#toolbar',
+
+              onLoadSuccess : function() {
+                parent.$.messager.progress('close');
+
+                $(this).datagrid('tooltip');
+              },
+              onAfterEdit : function(rowIndex, rowData, changes) {
+                //console.info(rowData);
+                afterEdit(rowIndex, rowData, changes);
+              },
+              onDblClickRow: function (index, row){
+                editFun(index);
+              }
+            });
+    afterSuccessLoad();
+
+    $('#cangPid').combogrid({
+      panelWidth:380,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      singleSelect : true,// 只能单选
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/cang/getCang',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#cangPid').combogrid('grid').datagrid('load', {sname: q});
+          $('#cangPid').combogrid('setValue',q);
+        }
+      },
+      columns:[[
+        {field:'id',title:'ID'},
+        {field:'sno',title:'图书编号',width : 60},
+        {field:'sname',title:'图书名称',align:'center'},
+        {field:'addition',title:'描述',width : 160},
+      ]],
+    })
+
+    $('#yuanPid').combogrid({
+      panelWidth:380,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      singleSelect : true,// 只能单选
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/yuan/getYuan',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+          $('#yuanPid').combogrid('setValue',q);
+        }
+      },
+      columns:[[
+        {field:'sno',title:'编号',width : 60},
+        {field:'sname',title:'名称',align:'center'},
+        {field:'addition',title:'联系方式',width : 160},
+        {field:'department',title:'部门',width : 160},
+      ]],
+    });
+    $('#guPid').combogrid({
+      panelWidth:380,
+      panelHeight:450,
+      idField : 'id',
+      textField : 'sname',
+      pagination : true,
+      fitColumns : true,
+      fit : true,
+      rownumbers : true,// 显示行号
+      singleSelect : true,// 只能单选
+      border : false,
+      striped : true,// 隔行变色
+      url: httphost + '/gu/getGu',
+      pageList : [15,30,50],
+      delay: 200,
+      keyHandler:  {      // 控件按键向后台请求数据
+        query: function (q) {
+          $('#guPid').combogrid('grid').datagrid('load', {sname: q});
+          $('#guPid').combogrid('setValue',q);
+        }
+      },
+      columns:[[
+        {field:'sno',title:'编号',width : 60},
+        {field:'sname',title:'名称',align:'center'},
+        {field:'addition',title:'联系方式',width : 160},
+        {field:'address',title:'地址',width : 160},
+      ]],
+    });
+
+    $('#w').window({
+      onBeforeClose: function() {
+        window.close();
+        return false;
+      }
+    })
+
+  });
+
+  /**
+   * 页面加载完毕后，马上运行此函数，根据是否为新增，进入编辑和新增功能
+   * szy
+   * 2023-3-30
+   */
+  function afterSuccessLoad(){
+    if(id > 0){		// 订单的修改页面
+      //获取单头信息
+      $.ajax({
+        type: "POST",
+        url: httphost + "/sale/getSingleSale",
+        data: {'id':id},
+        success: function (result) {
+          //console.info(result.sno);
+          $('#sno').val(result.sno);
+          $('#cangPid').val(result.cangPid);
+          $('#yuanPid').val(result.yuanPid);
+          $('#guPid').val(result.guPid);
+          $('#dueDate').datebox('setValue',result.dueDate);
+          $('#w').window({title:"销售订单： -- &nbsp;&nbsp; 修改"}) ;
+        }
+      });
+
+    }else{	// 新增界面
+      $('#w').window({title:"销售订单： -- &nbsp;&nbsp; 新增"}) ;
+    }
+  }
+
+  function clearHead(){
+    $('#sno').val('');
+    $('#cangPid').val('');
+    $('#yuanPid').val('');
+    $('#guPid').val('');
+    $('#dueDate').datebox('setValue','');
+  }
+
+  function editFun(index) {
+
+    if (editrow != 'undefined') {
+      dataGrid.datagrid('endEdit', editrow);
+    }
+    dataGrid.datagrid('removeEditor', [ 'id' ]);
+    dataGrid.datagrid('beginEdit', index);
+    editrow = index;
+  }
+
+  function deleteFun( ) {
+    //console.info(id);
+
+    let rows = dataGrid.datagrid('getChecked');
+    //console.info(rows);
+    if (rows.length > 0) {
+      parent.$.messager.confirm('询问', '您是否要删除当前销售订单明细？', function(b) {
+        if (b) {
+          parent.$.messager.progress({
+            title : '提示',
+            text : '数据处理中，请稍后....'
+          });
+          let ids =[];
+          // 这里必须反过来循环，否则最后一条选中记录不能删除
+          for ( let i = rows.length-1; i >= 0 ; i--){
+            ids.push(rows[i].id);
+            let rowIndex = dataGrid.datagrid('getRowIndex',rows[i])
+            dataGrid.datagrid('deleteRow',rowIndex);
+          }
+
+          console.info(ids.join(','));
+
+          parent.$.messager.progress('close');
+        }
+      });
+    }else {
+      $.messager.alert('提示','请选择要删除的记录！','error')
+    }
+  }
+
+  function afterEdit(rowIndex, rowData, changes) {
+    editrow = 'undefined'; //开关复位
+  }
+
+  function saveFun() {
+
+    dataGrid.datagrid('endEdit', editrow); //editrow 为本页面的局部变量
+  }
+
+  function addFun() {
+    if (editrow != 'undefined') {
+      dataGrid.datagrid('endEdit', editrow);
+    }
+    if (editrow == 'undefined') {
+      dataGrid.datagrid('insertRow', {
+        index : 0,
+        row : {}
+      });
+      dataGrid.datagrid('beginEdit', 0);
+      editrow = 0;
+    }
+  }
+
+  /**
+   * 提交 保存数据
+   */
+  function submitFun(){
+    let inserted = dataGrid.datagrid('getChanges', 'inserted');
+    let updated = dataGrid.datagrid('getChanges', 'updated');
+    let deleted = dataGrid.datagrid('getChanges', 'deleted');
+
+    if (inserted.length > 0 || updated.length >0 || deleted.length > 0){
+      parent.$.messager.confirm('询问', '您是否要更新当前销售订单？', function(b) {
+        if (b) {
+          parent.$.messager.progress({
+            title: '提示',
+            text: '数据处理中，请稍后....'
+          });
+          let saleDto = {
+            'id' : id,
+            'sno' : $('#sno').val(),
+            'addition' : $('#addition').val(),
+            'guPid' : $('#guPid').combogrid('getValue'),
+            'cangPid' : $('#cangPid').combogrid('getValue'),
+            'yuanPid' : $('#yuanPid').combogrid('getValue'),
+            'dueDate' : $('#dueDate').datebox('getValue'),
+            'inserted': JSON.stringify(inserted),
+            'updated' : JSON.stringify(updated),
+            'deleted' : JSON.stringify(deleted),
+          };
+          //console.info(saleDto);
+          $.ajax({
+            type : "POST",
+            url : '/sale/add',
+            data : saleDto, //JSON.stringify(saleDto),
+            //	contentType: "application/json; charset=utf-8",
+            dataType : 'json',
+            success : function(r) {
+              if (r && r.success) {
+                //parent.$.messager.alert('数据更新', r.msg); //easyui中的控件messager
+                alert( r.msg);
+                /*dataGrid.datagrid('reload');
+                clearHead()*/
+                window.close();
+
+                /*id = r.id;
+                dataGrid.datagrid({url:httphost + '/sale/getSaleDetails/' + id});*/
+              } else {
+                parent.$.messager.alert('数据更新或插入', r.msg, 'error'); //easyui中的控件messager
+                dataGrid.datagrid('rejectChanges');
+              }
+            }
+          });
+
+
+        }
+      })
+    }
+  }
+  function getSerial(){
+    $.ajax({
+      type: "POST",
+      url: httphost + "/sale/getSerial",
+      success: function (result) {
+        // console.log(result);
+        $('#sno').val(result);
+
+      }
+    });
+  }
+  /**
+   *
+   * @param dt array
+   */
+  function transferDetail( sr ){
+    let target = [];
+    if (sr.length == 0) return target;
+    for (i =0 ; i<sr.length; i++){
+      let t={num:'',price:'',salePid:id,goodsPid:''};
+      //	console.info(sr[i]);
+      if (sr[i].num!=null)
+        t.num = sr[i].num;
+
+      if (sr[i].price!=null)
+        t.price = sr[i].price;
+
+      t.goodsPid = sr[i].goodsPid;
+      // t.color = sr[i].color;
+      target.push(t);
+    }
+    return target;
+  }
+
+
+
+</script>
+<body>
+
+<!--<div style="margin:20px 0;">
+	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#w').window('open')">Open</a>
+	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#w').window('close')">Close</a>
+</div>-->
+<div id="w" class="easyui-window" title="销售订单 " data-options="iconCls:'icon-save'" style="width:800px;height:700px;padding:5px;">
+  <div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',split:true" style="height:100px" >
+      <form id="fm_sale">
+        <table style="padding:10px 0 0 0;">
+          <tr>
+            <td>销售单号：</td><td><input id="sno" name="sno" readonly></td>
+            <td>发货仓库：</td><td><input id="cangPid" name="cangPid" ></td>
+            <td>员工</td><td><input id="yuanPid" name="yuanPid" ></td>
+          </tr>
+          <tr>
+            <td>顾客</td><td><input id="guPid" name="guPid" ></td>
+            <td>销售日期：</td><td><input id="dueDate" name="dueDate" class="easyui-datebox" ></td>
+          </tr>
+        </table>
+        <div style="text-align:right;padding:2px 0 2px;">
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" href="javascript:void(0)" onclick="addFun()" style="width:90px">新增一行</a>
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0)" onclick="saveFun();" style="width:90px">暂存</a>
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-remove'" href="javascript:void(0)" onclick="deleteFun();" style="width:90px">删除选中</a>
+          <a class="easyui-linkbutton" data-options="iconCls:'icon-reload'" href="javascript:void(0)" onclick="dataGrid.datagrid('reload');" style="width:90px">刷新</a>
+        </div>
+      </form>
+    </div>
+    <div data-options="region:'center'" style="padding:0 0 40px 0;">
+      <div id="dg_saleDetail"/>
+    </div>
+    <div data-options="region:'south'" style="text-align:right;padding:5px 0 0;">
+      <td>备注：</td><td><input id="addition" name="addition"></td>
+      <a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="submitFun();" style="width:80px">Ok</a>
+      <a class="easyui-linkbutton" data-options="iconCls:'transmit'" href="javascript:void(0)" onclick="window.close();" style="width:80px">Cancel</a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
