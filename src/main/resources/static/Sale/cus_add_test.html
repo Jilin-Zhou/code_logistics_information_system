@@ -2,14 +2,13 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>销售订单 -- 新增</title>
+  <title>销售订单确认</title>
   <link rel="stylesheet" type="text/css" href="/easyUI/themes/default/easyui.css">
   <link rel="stylesheet" type="text/css" href="/easyUI/themes/icon.css">
   <link rel="stylesheet" type="text/css" href="/easyUI/themes/myicon.css">
   <link rel="stylesheet" type="text/css" href="/easyUI/themes/color.css">
   <link rel="stylesheet" type="text/css" href="/myCSS/demo.css">
   <style>
-    /* 与zhuye.html一致的样式 */
     * {
       margin: 0;
       padding: 0;
@@ -29,8 +28,8 @@
 
     /* 标题样式 */
     .page-title {
-      background-color: #333;
-      color: white;
+      background-color: #F9F9F9;
+      color: black;
       padding: 15px 0;
       text-align: center;
       margin-bottom: 20px;
@@ -248,45 +247,45 @@
                   formatter: function(value, row, index) {
                     return row.goodsName;
                   },
-                  editor : {type : 'combogrid',options : {required : false,
-                      panelWidth:380,
-                      panelHeight:450,
-                      idField : 'id',
-                      textField : 'sname',
-                      pagination : true,
-                      fitColumns : true,
-                      fit : true,
-                      rownumbers : true,// 显示行号
-                      singleSelect : true,// 只能单选
-                      border : false,
-                      striped : true,// 隔行变色
-                      url: httphost + '/goods/getGoods',
-                      pageList : [15,30,50],
-                      keyHandler:{
-                        query: function (q) {
-                          $('#comboGrid-editor').combogrid('grid').datagrid('load', {sname: q});
-                          $('#comboGrid-editor').combogrid('setValue',q);
-                        }
-                      } ,
-                      columns:[[
-                        {field:'id',title:'ID'},
-                        {field:'sno',title:'图书编号',width : 60},
-                        {field:'sname',title:'图书名称',align:'center'},
-                        {field:'goodType',title:'图书类别',width : 160},
-                      ]],
-                      onSelect: function(row, rowData){
-                        var rowIndex= editrow; //dataGrid.datagrid('getRowIndex',dataGrid.datagrid('getSelected'));
-                        dataGrid.datagrid('beginEdit', rowIndex);
-                        let editors = dataGrid.datagrid('getEditors', rowIndex);
-                        let goodType = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsTypeName' });
-                        $(goodType.target).val(rowData.goodType);
-                        let goodsName = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsName' });
-                        $(goodsName.target).val(rowData.sname);
-                        let price = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'price'});
-                        $(price.target).val(rowData.sprice);
-                      }
-                    } },
-
+                  // editor : {type : 'combogrid',options : {required : false,
+                  //     panelWidth:380,
+                  //     panelHeight:450,
+                  //     idField : 'id',
+                  //     textField : 'sname',
+                  //     pagination : true,
+                  //     fitColumns : true,
+                  //     fit : true,
+                  //     rownumbers : true,// 显示行号
+                  //     singleSelect : true,// 只能单选
+                  //     border : false,
+                  //     striped : true,// 隔行变色
+                  //     url: httphost + '/goods/getGoods',
+                  //     pageList : [15,30,50],
+                  //     keyHandler:{
+                  //       query: function (q) {
+                  //         $('#comboGrid-editor').combogrid('grid').datagrid('load', {sname: q});
+                  //         $('#comboGrid-editor').combogrid('setValue',q);
+                  //       }
+                  //     } ,
+                  //     columns:[[
+                  //       {field:'id',title:'ID'},
+                  //       {field:'sno',title:'图书编号',width : 60},
+                  //       {field:'sname',title:'图书名称',align:'center'},
+                  //       {field:'goodType',title:'图书类别',width : 160},
+                  //     ]],
+                  //     onSelect: function(row, rowData){
+                  //       var rowIndex= editrow; //dataGrid.datagrid('getRowIndex',dataGrid.datagrid('getSelected'));
+                  //       dataGrid.datagrid('beginEdit', rowIndex);
+                  //       let editors = dataGrid.datagrid('getEditors', rowIndex);
+                  //       let goodType = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsTypeName' });
+                  //       $(goodType.target).val(rowData.goodType);
+                  //       let goodsName = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'goodsName' });
+                  //       $(goodsName.target).val(rowData.sname);
+                  //       let price = dataGrid.datagrid('getEditor', { index: rowIndex, field: 'price'});
+                  //       $(price.target).val(rowData.sprice);
+                  //     }
+                  //   } },
+                  editor: false
                 }, {
                   field : 'goodsName',
                   title : '图书名称',
@@ -304,9 +303,10 @@
                   width : 140,
                   align: "center",
                   sortable : true,
-                  editor: {
-                    type: 'text',
-                  }
+                  // editor: {
+                  //   type: 'text',
+                  // }
+                  editor: false
                 },
               ] ],
               columns : [ [
@@ -327,12 +327,13 @@
                   title : '销售价格',
                   align : 'center',
                   width : 160,
-                  editor : {
-                    type : 'validatebox',
-                    options : {
-                      required : false,
-                    }
-                  }
+                  // editor : {
+                  //   type : 'validatebox',
+                  //   options : {
+                  //     required : false,
+                  //   }
+                  // }
+                  editor: false
                 }
 
               ] ],
@@ -434,12 +435,12 @@
           $('#yuanPid').val(result.yuanPid);
           $('#guPid').val(result.guPid);
           $('#dueDate').datebox('setValue',result.dueDate);
-          $('#w').window({title:"销售订单： -- &nbsp;&nbsp; 修改"}) ;
+          $('#w').window({title:"销售订单"}) ;
         }
       });
 
     }else{	// 新增界面
-      $('#w').window({title:"销售订单： -- &nbsp;&nbsp; 新增"}) ;
+      $('#w').window({title:"销售订单"}) ;
       let defaultDate = new Date();
       defaultDate.setDate(defaultDate.getDate());
       let formattedDate = defaultDate.toISOString().split('T')[0];
@@ -614,7 +615,7 @@
 </script>
 <body>
 <div class="page-title">
-  <h1>销售订单管理</h1>
+  <h1>销售订单确认</h1>
 </div>
 
 <div id="w" class="easyui-window" title="销售订单" data-options="iconCls:'icon-save'" style="width:800px;height:700px;padding:0;">
@@ -629,7 +630,7 @@
             <input id="cangPid" name="cangPid" class="textbox">
           </div>
           <div class="form-row">
-            <label>用户：</label>
+            <label>收货人：</label>
             <input id="guPid" name="guPid" class="textbox">
             <label style="margin-left:20px;">销售日期：</label>
             <input id="dueDate" name="dueDate" class="easyui-datebox">
