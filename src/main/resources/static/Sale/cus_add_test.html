@@ -382,34 +382,34 @@
       ]],
     })
 
-    $('#yuanPid').combogrid({
-      panelWidth:380,
-      panelHeight:450,
-      idField : 'id',
-      textField : 'sname',
-      pagination : true,
-      fitColumns : true,
-      fit : true,
-      rownumbers : true,// 显示行号
-      singleSelect : true,// 只能单选
-      border : false,
-      striped : true,// 隔行变色
-      url: httphost + '/yuan/getYuan',
-      pageList : [15,30,50],
-      delay: 200,
-      keyHandler:  {      // 控件按键向后台请求数据
-        query: function (q) {
-          $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
-          $('#yuanPid').combogrid('setValue',q);
-        }
-      },
-      columns:[[
-        {field:'sno',title:'编号',width : 60},
-        {field:'sname',title:'名称',align:'center'},
-        {field:'addition',title:'联系方式',width : 160},
-        {field:'department',title:'部门',width : 160},
-      ]],
-    });
+    // $('#yuanPid').combogrid({
+    //   panelWidth:380,
+    //   panelHeight:450,
+    //   idField : 'id',
+    //   textField : 'sname',
+    //   pagination : true,
+    //   fitColumns : true,
+    //   fit : true,
+    //   rownumbers : true,// 显示行号
+    //   singleSelect : true,// 只能单选
+    //   border : false,
+    //   striped : true,// 隔行变色
+    //   url: httphost + '/yuan/getYuan',
+    //   pageList : [15,30,50],
+    //   delay: 200,
+    //   keyHandler:  {      // 控件按键向后台请求数据
+    //     query: function (q) {
+    //       $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+    //       $('#yuanPid').combogrid('setValue',q);
+    //     }
+    //   },
+    //   columns:[[
+    //     {field:'sno',title:'编号',width : 60},
+    //     {field:'sname',title:'名称',align:'center'},
+    //     {field:'addition',title:'联系方式',width : 160},
+    //     {field:'department',title:'部门',width : 160},
+    //   ]],
+    // });
 
     $('#w').window({
       onBeforeClose: function() {
@@ -537,9 +537,11 @@
             'id' : id,
             'sno' : $('#sno').val(),
             'addition' : $('#addition').val(),
-            'guPid' : $('#guPid').combogrid('getValue'),
+            // 'guPid' : $('#guPid').combogrid('getValue'),
+            'guPid' : $('#guPid').val(),
             'cangPid' : $('#cangPid').combogrid('getValue'),
-            'yuanPid' : $('#yuanPid').combogrid('getValue'),
+            // 'cangPid' : $('#cangPid').val(),
+            // 'yuanPid' : $('#yuanPid').combogrid('getValue'),
             'dueDate' : $('#dueDate').datebox('getValue'),
             'inserted': JSON.stringify(inserted),
             'updated' : JSON.stringify(updated),
@@ -608,60 +610,7 @@
     return target;
   }
 
-  // 在zhuye.html中添加的函数，用于从购物车传递数据到订单页面
-  function addPlans() {
-    if (!isLoggedIn) {
-      alert('请先登录再进行结算！');
-      window.location.href = 'http://localhost:8888/login.html';
-      return;
-    }
 
-    if (cart.items.length === 0) {
-      alert('购物车是空的，请先添加商品！');
-      return;
-    }
-
-    // 准备要传递的数据
-    const checkoutData = {
-      username: username,
-      cartItems: cart.items.map(item => ({
-        id: item.id,
-        goodsName: item.sname,
-        goodsTypeName: getCategoryName(item.goodsTypePid),
-        price: item.sprice,
-        num: item.quantity
-      }))
-    };
-
-    // 将数据存储在localStorage中
-    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-
-    // 跳转到订单页面
-    url = 'Sale/cus_add.html';
-    param = {"id": '-1'};
-    open_page(url, param);
-  }
-
-  function getCategoryName(goodsTypePid) {
-    switch (parseInt(goodsTypePid)) {
-      case 1:
-        return '计算机';
-      case 2:
-        return '文学';
-      case 3:
-        return '经济管理';
-      case 4:
-        return '少儿读物';
-      case 5:
-        return '艺术设计';
-      case 6:
-        return '科学技术';
-      case 7:
-        return '生活健康';
-      default:
-        return '未分类';
-    }
-  }
 </script>
 <body>
 <div class="page-title">
@@ -670,7 +619,7 @@
 
 <div id="w" class="easyui-window" title="销售订单" data-options="iconCls:'icon-save'" style="width:800px;height:700px;padding:0;">
   <div class="easyui-layout" data-options="fit:true">
-    <div data-options="region:'north',split:true" style="height:120px; padding:10px; background-color:#f5f5f5;">
+    <div data-options="region:'north',split:true" style="height:200px; padding:10px; background-color:#f5f5f5;">
       <div class="form-container">
         <form id="fm_sale">
           <div class="form-row">
@@ -688,25 +637,30 @@
         </form>
       </div>
       <div class="btn-container">
-        <a class="btn btn-primary" onclick="addFun()"><i class="icon-add"></i> 新增一行</a>
-        <a class="btn btn-primary" onclick="saveFun();"><i class="icon-save"></i> 暂存</a>
-        <a class="btn btn-danger" onclick="deleteFun();"><i class="icon-remove"></i> 删除选中</a>
-        <a class="btn btn-default" onclick="dataGrid.datagrid('reload');"><i class="icon-reload"></i> 刷新</a>
+<!--        <a class="btn btn-primary" onclick="addFun()"><i class="icon-add"></i> 新增一行</a>-->
+<!--        <a class="btn btn-primary" onclick="saveFun();"><i class="icon-save"></i> 暂存</a>-->
+<!--        <a class="btn btn-danger" onclick="deleteFun();"><i class="icon-remove"></i> 删除选中</a>-->
+<!--        <a class="btn btn-default" onclick="dataGrid.datagrid('reload');"><i class="icon-reload"></i> 刷新</a>-->
+        <div class="footer-btns">
+          <a class="btn btn-primary" onclick="saveFun();"><i class="icon-save"></i> 暂存</a>
+          <a class="btn btn-danger" onclick="deleteFun();"><i class="icon-remove"></i> 删除选中</a>
+          <a class="btn btn-primary" onclick="submitFun();"><i class="icon-ok"></i> 确定</a>
+          <a class="btn btn-default" onclick="window.close();"><i class="icon-cancel"></i> 取消</a>
+        </div>
       </div>
     </div>
     <div data-options="region:'center'" style="padding:0;">
       <div id="dg_saleDetail"></div>
     </div>
+
     <div data-options="region:'south'" style="height:60px; background-color:#f5f5f5; padding:10px;">
       <div class="form-row">
         <label>备注：</label>
         <input id="addition" name="addition" class="textbox">
       </div>
-      <div class="footer-btns">
-        <a class="btn btn-primary" onclick="submitFun();"><i class="icon-ok"></i> 确定</a>
-        <a class="btn btn-default" onclick="window.close();"><i class="icon-cancel"></i> 取消</a>
-      </div>
+
     </div>
+
   </div>
 </div>
 
