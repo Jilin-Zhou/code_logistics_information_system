@@ -3,8 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>销售订单 -- 新增</title>
+  <link rel="stylesheet" type="text/css" href="/easyUI/themes/default/easyui.css">
+  <link rel="stylesheet" type="text/css" href="/easyUI/themes/icon.css">
+  <link rel="stylesheet" type="text/css" href="/easyUI/themes/myicon.css">
+  <link rel="stylesheet" type="text/css" href="/easyUI/themes/color.css">
+  <link rel="stylesheet" type="text/css" href="/myCSS/demo.css">
   <style>
-    /* 新增统一样式 */
+    /* 与zhuye.html一致的样式 */
     * {
       margin: 0;
       padding: 0;
@@ -22,72 +27,132 @@
       padding: 20px;
     }
 
-    /* 统一表单样式 */
-    .form-group {
-      margin-bottom: 15px;
+    /* 标题样式 */
+    .page-title {
+      background-color: #333;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .form-group label {
-      display: block;
-      margin-bottom: 5px;
+    /* 表单样式 */
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .form-row {
+      display: flex;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+
+    .form-row label {
+      width: 100px;
       color: #666;
     }
 
-    .easyui-textbox, .easyui-datebox, .easyui-combogrid {
-      width: 100%!important;
-      padding: 8px!important;
-      border: 1px solid #ddd!important;
-      border-radius: 4px!important;
+    .form-row input, .form-row select {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
 
-    /* 统一按钮样式 */
-    .easyui-linkbutton {
-      background-color: #4CAF50!important;
-      color: white!important;
-      border: none!important;
-      border-radius: 4px!important;
-      padding: 8px 15px!important;
-      transition: background-color 0.3s ease!important;
+    /* 按钮样式 */
+    .btn-container {
+      display: flex;
+      justify-content: flex-end;
+      margin: 10px 0;
     }
 
-    .easyui-linkbutton:hover {
-      background-color: #45a049!important;
+    .btn {
+      padding: 8px 15px;
+      margin-left: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
     }
 
-    /* 窗口样式调整 */
-    .easyui-window {
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1)!important;
-      border-radius: 8px!important;
+    .btn-primary {
+      background-color: #4CAF50;
+      color: white;
     }
 
-    /* 表格样式优化 */
-    .datagrid-header td {
-      background-color: #f8f9fa!important;
-      color: #333!important;
+    .btn-danger {
+      background-color: #f44336;
+      color: white;
     }
 
-    .datagrid-row-alt {
-      background-color: #f8f9fa!important;
+    .btn-default {
+      background-color: #f1f1f1;
+      color: #333;
     }
 
-    /* 底部操作栏调整 */
-    .easyui-layout .layout-south {
-      background-color: #fff!important;
-      padding: 15px 20px!important;
-      border-top: 1px solid #eee!important;
+    /* 数据网格样式覆盖 */
+    .datagrid-header-row, .datagrid-row {
+      height: 40px;
+    }
+
+    .datagrid-cell {
+      font-size: 14px;
+      padding: 8px;
+    }
+
+    .window-header {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    /* 底部按钮 */
+    .footer-btns {
+      text-align: right;
+      padding: 15px;
+      background-color: #f8f8f8;
+      border-top: 1px solid #ddd;
+    }
+
+    .footer-btns .btn {
+      margin-left: 10px;
+    }
+
+    /* 输入框样式统一 */
+    input.easyui-datebox {
+      height: 34px;
+      line-height: 34px;
+    }
+
+    .textbox {
+      border-radius: 4px;
+    }
+
+    /* 覆盖EasyUI的部分样式 */
+    .panel-header, .panel-body {
+      border-color: #ddd;
+    }
+
+    .datagrid-toolbar, .datagrid-pager {
+      background: #f8f8f8;
+    }
+
+    .l-btn {
+      border-radius: 4px;
+      padding: 5px 10px;
+    }
+
+    .l-btn-text {
+      font-size: 14px;
     }
   </style>
 </head>
-<link rel="stylesheet" type="text/css" href="/easyUI/themes/default/easyui.css">
-<link rel="stylesheet" type="text/css" href="/easyUI/themes/icon.css">
-<link rel="stylesheet" type="text/css" href="/easyUI/themes/myicon.css">
-<link rel="stylesheet" type="text/css" href="/easyUI/themes/color.css">
-<link rel="stylesheet" type="text/css" href="/myCSS/demo.css">
-
 <script type="text/javascript" src="/easyUI/jquery.js"></script>
 <script type="text/javascript" src="/easyUI/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="/easyUI/locale/easyui-lang-zh_CN.js"></script>
-
 <script type="text/javascript" src="/easyUI/extJquery.js"></script>
 <script type="text/javascript" src="/easyUI/extEasyUI.js"></script>
 <script type="text/javascript" src="/myJs/showMessage.js"></script>
@@ -108,6 +173,45 @@
   let dataGrid;
 
   $(function() {
+    // 从localStorage获取结算数据
+    const checkoutDataString = localStorage.getItem('checkoutData');
+    if (checkoutDataString) {
+      try {
+        const checkoutData = JSON.parse(checkoutDataString);
+
+        // 设置用户名
+        if (checkoutData.username) {
+          $('#guPid').val(checkoutData.username);
+        }
+
+        // 添加购物车商品到订单明细
+        if (checkoutData.cartItems && checkoutData.cartItems.length > 0) {
+          setTimeout(function() {
+            for (let i = 0; i < checkoutData.cartItems.length; i++) {
+              const item = checkoutData.cartItems[i];
+
+              // 添加一行
+              dataGrid.datagrid('insertRow', {
+                index: i,
+                row: {
+                  goodsPid: item.id,
+                  goodsName: item.goodsName,
+                  goodsTypeName: item.goodsTypeName,
+                  price: item.price,
+                  num: item.num
+                }
+              });
+            }
+
+            // 清除localStorage中的数据，避免重复添加
+            localStorage.removeItem('checkoutData');
+          }, 500); // 延迟执行，确保dataGrid已经初始化完成
+        }
+      } catch (e) {
+        console.error("解析结算数据时出错:", e);
+      }
+    }
+
     getSerial();
     // 注册dataGrid
     dataGrid = $('#dg_saleDetail')
@@ -504,42 +608,107 @@
     return target;
   }
 
+  // 在zhuye.html中添加的函数，用于从购物车传递数据到订单页面
+  function addPlans() {
+    if (!isLoggedIn) {
+      alert('请先登录再进行结算！');
+      window.location.href = 'http://localhost:8888/login.html';
+      return;
+    }
 
+    if (cart.items.length === 0) {
+      alert('购物车是空的，请先添加商品！');
+      return;
+    }
 
+    // 准备要传递的数据
+    const checkoutData = {
+      username: username,
+      cartItems: cart.items.map(item => ({
+        id: item.id,
+        goodsName: item.sname,
+        goodsTypeName: getCategoryName(item.goodsTypePid),
+        price: item.sprice,
+        num: item.quantity
+      }))
+    };
+
+    // 将数据存储在localStorage中
+    localStorage.setItem('checkoutData', JSON.stringify(checkoutData));
+
+    // 跳转到订单页面
+    url = 'Sale/cus_add.html';
+    param = {"id": '-1'};
+    open_page(url, param);
+  }
+
+  function getCategoryName(goodsTypePid) {
+    switch (parseInt(goodsTypePid)) {
+      case 1:
+        return '计算机';
+      case 2:
+        return '文学';
+      case 3:
+        return '经济管理';
+      case 4:
+        return '少儿读物';
+      case 5:
+        return '艺术设计';
+      case 6:
+        return '科学技术';
+      case 7:
+        return '生活健康';
+      default:
+        return '未分类';
+    }
+  }
 </script>
 <body>
-<div id="w" class="easyui-window" title="销售订单 " data-options="iconCls:'icon-save'" style="width:800px;height:700px;padding:5px;">
+<div class="page-title">
+  <h1>销售订单管理</h1>
+</div>
+
+<div id="w" class="easyui-window" title="销售订单" data-options="iconCls:'icon-save'" style="width:800px;height:700px;padding:0;">
   <div class="easyui-layout" data-options="fit:true">
-    <div data-options="region:'north',split:true" style="height:100px" >
-      <form id="fm_sale">
-        <table style="padding:10px 0 0 0;">
-          <tr>
-            <td>销售单号：</td><td><input id="sno" name="sno" readonly></td>
-            <td>发货仓库：</td><td><input id="cangPid" name="cangPid" ></td>
-            <!--            <td>员工</td><td><input id="yuanPid" name="yuanPid" ></td>-->
-          </tr>
-          <tr>
-            <td>用户：</td><td><input id="guPid" name="guPid" ></td>
-            <td>销售日期：</td><td><input id="dueDate" name="dueDate" class="easyui-datebox" ></td>
-          </tr>
-        </table>
-        <div style="text-align:right;padding:2px 0 2px;">
-          <a class="easyui-linkbutton" data-options="iconCls:'icon-add'" href="javascript:void(0)" onclick="addFun()" style="width:90px">新增一行</a>
-          <a class="easyui-linkbutton" data-options="iconCls:'icon-save'" href="javascript:void(0)" onclick="saveFun();" style="width:90px">暂存</a>
-          <a class="easyui-linkbutton" data-options="iconCls:'icon-remove'" href="javascript:void(0)" onclick="deleteFun();" style="width:90px">删除选中</a>
-          <a class="easyui-linkbutton" data-options="iconCls:'icon-reload'" href="javascript:void(0)" onclick="dataGrid.datagrid('reload');" style="width:90px">刷新</a>
-        </div>
-      </form>
+    <div data-options="region:'north',split:true" style="height:120px; padding:10px; background-color:#f5f5f5;">
+      <div class="form-container">
+        <form id="fm_sale">
+          <div class="form-row">
+            <label>销售单号：</label>
+            <input id="sno" name="sno" readonly class="textbox">
+            <label style="margin-left:20px;">发货仓库：</label>
+            <input id="cangPid" name="cangPid" class="textbox">
+          </div>
+          <div class="form-row">
+            <label>用户：</label>
+            <input id="guPid" name="guPid" class="textbox">
+            <label style="margin-left:20px;">销售日期：</label>
+            <input id="dueDate" name="dueDate" class="easyui-datebox">
+          </div>
+        </form>
+      </div>
+      <div class="btn-container">
+        <a class="btn btn-primary" onclick="addFun()"><i class="icon-add"></i> 新增一行</a>
+        <a class="btn btn-primary" onclick="saveFun();"><i class="icon-save"></i> 暂存</a>
+        <a class="btn btn-danger" onclick="deleteFun();"><i class="icon-remove"></i> 删除选中</a>
+        <a class="btn btn-default" onclick="dataGrid.datagrid('reload');"><i class="icon-reload"></i> 刷新</a>
+      </div>
     </div>
-    <div data-options="region:'center'" style="padding:0 0 40px 0;">
-      <div id="dg_saleDetail"/>
+    <div data-options="region:'center'" style="padding:0;">
+      <div id="dg_saleDetail"></div>
     </div>
-    <div data-options="region:'south'" style="text-align:right;padding:5px 0 0;">
-      <td>备注：</td><td><input id="addition" name="addition"></td>
-      <a class="easyui-linkbutton" data-options="iconCls:'icon-ok'" href="javascript:void(0)" onclick="submitFun();" style="width:80px">Ok</a>
-      <a class="easyui-linkbutton" data-options="iconCls:'transmit'" href="javascript:void(0)" onclick="window.close();" style="width:80px">Cancel</a>
+    <div data-options="region:'south'" style="height:60px; background-color:#f5f5f5; padding:10px;">
+      <div class="form-row">
+        <label>备注：</label>
+        <input id="addition" name="addition" class="textbox">
+      </div>
+      <div class="footer-btns">
+        <a class="btn btn-primary" onclick="submitFun();"><i class="icon-ok"></i> 确定</a>
+        <a class="btn btn-default" onclick="window.close();"><i class="icon-cancel"></i> 取消</a>
+      </div>
     </div>
   </div>
 </div>
+
 </body>
 </html>

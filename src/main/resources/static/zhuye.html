@@ -697,41 +697,6 @@
         updateCart();
     }
 
-    // function proceedToCheckout() {
-    //     if (!isLoggedIn) {
-    //         alert('请先登录再进行结算！');
-    //         window.location.href = 'http://localhost:8888/login.html';
-    //         return;
-    //     }
-    //     if (cart.items.length === 0) {
-    //         alert('购物车是空的，请先添加商品！');
-    //         return;
-    //     }
-    //     // Prepare data to transfer
-    //     const checkoutData = {
-    //         user: {
-    //             username: username // Pass the username
-    //             // Potentially add user ID if available and needed
-    //         },
-    //         cart: cart.items.map(item => ({ // Map to required fields for add.html
-    //             // goodsPid: item.id,          // Product ID
-    //             goodsTypeName:getCategoryName(item.goodsTypePid),
-    //             goodsName: item.sname,      // Product Name
-    //             price: item.sprice,         // Price per item
-    //             num: item.quantity,       // Quantity
-    //         }))
-    //     };
-    //
-    //     try {
-    //         sessionStorage.setItem('checkoutData', JSON.stringify(checkoutData));
-    //         console.log('Checkout data stored in sessionStorage:', checkoutData);
-    //
-    //         window.location.href = 'sale/cus_add.html';
-    //     } catch (e) {
-    //         console.error("Error storing checkout data in sessionStorage:", e);
-    //         alert('结算时发生错误，请稍后重试。');
-    //     }
-    // }
 
     // 分类切换
     document.querySelectorAll('.category-item').forEach(item => {
