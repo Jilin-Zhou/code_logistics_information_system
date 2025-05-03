@@ -347,6 +347,10 @@
 
     }else{	// 新增界面
       $('#w').window({title:"入库单： -- &nbsp;&nbsp; 新增"}) ;
+      let defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate());
+      let formattedDate = defaultDate.toISOString().split('T')['0'];
+      $('#dueDate').datebox('setValue',formattedDate);
     }
   }
 
