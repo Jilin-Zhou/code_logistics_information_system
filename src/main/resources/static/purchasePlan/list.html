@@ -75,7 +75,20 @@
                         width : 180,
                         sortable : true,
                         align : "center",
-                    },{	field : 'addition',
+                    },
+                    {   field : 'status',
+                        title : '订单状态',
+                        width : 120,
+                        align : "center",
+                        formatter: function(value, row, index) {
+                            if (value === 'completed') {
+                                return '<span style="color:green;">已完成</span>';
+                            } else {
+                                return '<span style="color:orange;">进行中</span>';
+                            }
+                        }
+                    },
+                    {	field : 'addition',
                         title : '备注',
                         width : 180,
                         sortable : true,
@@ -111,6 +124,13 @@
                     parent.$.messager.progress('close');
 
                     $(this).datagrid('tooltip');
+
+                    // 加载完成后获取每行数据状态
+                    var rows = $(this).datagrid('getRows');
+                    for(var i = 0; i < rows.length; i++) {
+                        checkOrderStatus(rows[i], i);
+                    }
+                    // console.log(rows);
                 },
             });
         $('#canID').combobox({
@@ -135,25 +155,7 @@
         });
     }
 
-    function clearHisData(){
-        let flag=confirm("确认要删除吗?");
-        if(flag){
-            $.ajax({
-                url : httphost + '/realWeight/clearHisRealWeight',
-                /* data : data,
-                dataType : 'json', */
-                success : function(r) {
-                    if (r && r.success) {
-                        parent.$.messager.alert('实时重量数据删除', r.msg); //
-                        dataGrid.datagrid('reload');
-                    } else {
-                        parent.$.messager.alert('实时重量数据删除', r.msg, 'error');
 
-                    }
-                }
-            });
-        }
-    }
 
     function clearSearch() {
         $('#dataGrid').datagrid('load', {});
@@ -241,6 +243,76 @@
                 alert("websocket发生了错误");
             }
         }
+    }
+
+    // 检查订单状态的新函数
+    function checkOrderStatus(row, rowIndex) {
+        if (!row || !row.id) return;
+
+        $.ajax({
+            type: "GET",
+            url: httphost + '/purchasePlan/getPurchasePlanDetails/' + row.id,
+            dataType: 'json',
+            success: function(result) {
+                if (!result || !result.rows) {
+                    // 没有明细数据，默认为未完成
+                    updateRowStatus(rowIndex, false);
+                    return;
+                }
+
+                // 创建一个Map来存储每个purchase_plan_pid的所有明细条目
+                let planDetailsMap = new Map();
+
+                // 遍历所有明细记录，按purchase_plan_pid分组
+                for (let i = 0; i < result.rows.length; i++) {
+                    let detail = result.rows[i];
+                    let planId = detail.purchasePlanPid;
+
+                    if (!planId) continue;
+
+                    // 如果是第一次看到这个planId，初始化一个数组
+                    if (!planDetailsMap.has(planId)) {
+                        planDetailsMap.set(planId, []);
+                    }
+
+                    // 将这条明细记录添加到对应的planId数组中
+                    planDetailsMap.get(planId).push(detail);
+                }
+
+                // 检查每个采购计划单的明细是否都已完成
+                let allCompleted = true;
+
+                // 遍历Map中的每个计划单
+                for (let [planId, details] of planDetailsMap) {
+                    // 检查这个计划单的所有明细是否都已完成(isClose=1)
+                    let planCompleted = details.every(detail => detail.isClose === 1);
+
+                    // 如果任何一个计划单没有完成，整体就是未完成
+                    if (!planCompleted) {
+                        allCompleted = false;
+                        break;
+                    }
+                }
+
+                // 更新行状态
+                updateRowStatus(rowIndex, allCompleted);
+            },
+            error: function() {
+                console.error('获取订单详情失败: ' + row.id);
+                // 发生错误时，默认为未完成
+                updateRowStatus(rowIndex, false);
+            }
+        });
+    }
+
+    // 辅助函数，用于更新行状态
+    function updateRowStatus(rowIndex, isCompleted) {
+        $('#dataGrid').datagrid('updateRow', {
+            index: rowIndex,
+            row: {
+                status: isCompleted ? 'completed' : 'processing'
+            }
+        });
     }
 
 </script>
