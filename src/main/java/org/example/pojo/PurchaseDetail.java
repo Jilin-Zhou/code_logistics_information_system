@@ -27,6 +27,9 @@ public class PurchaseDetail implements Serializable {
     @Column(name = "alreadyNum")
     Integer alreadyNum;
 
+    @Column(name = "isClose")
+    int isClose;            // 1: 本采购项目已经完结， 否则为 0；
+
     @JoinColumn(name="purchasePid")
     @ManyToOne(targetEntity=Purchase.class,fetch = FetchType.LAZY)
     @JsonIgnore
@@ -36,6 +39,14 @@ public class PurchaseDetail implements Serializable {
     @ManyToOne(targetEntity=PurchasePlanDetail.class,fetch = FetchType.LAZY)
     @JsonIgnore
     PurchasePlanDetail purchasePlanDetail;
+
+    @PreUpdate
+    public void preUpdate(){
+        if (this.alreadyNum - this.num >=0)
+            this.isClose = 1;
+        else
+            this.isClose = 0;
+    }
 
     @Transient  // 采购单PId
     public Integer getPurchasePid(){
