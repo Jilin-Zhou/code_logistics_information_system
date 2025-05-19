@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>课程作品引导页</title>
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* 使得内容垂直排列 */
+            justify-content: center; /* 垂直居中 */
+            align-items: center; /* 水平居中 */
+            min-height: 100vh; /* 占满整个视口高度 */
+            background-color: #e6ffe6; /* 淡绿色背景 */
+            color: #333; /* 深灰色文字，用于对比 */
+        }
+
+        /* 内容容器 */
+        .container {
+            background-color: #ffffff; /* 白色内容区域背景 */
+            padding: 40px 50px;
+            border-radius: 12px; /* 圆角 */
+            box-shadow: 0 8px 16px rgba(0, 100, 0, 0.15); /* 绿色调的阴影 */
+            text-align: center;
+            width: 90%; /* 响应式宽度 */
+            max-width: 500px; /* 最大宽度 */
+        }
+
+        /* 标题样式 */
+        h1 {
+            color: #2E8B57; /* 海绿色 (SeaGreen)，更深的绿色 */
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+        /* 按钮容器 */
+        .button-container {
+            margin-bottom: 30px; /* 按钮和下方信息的间距 */
+        }
+
+        /* 按钮通用样式 */
+        .button {
+            display: inline-block; /* 使按钮可以并排，并应用padding/margin */
+            padding: 15px 30px;
+            margin: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-decoration: none; /* 去除链接下划线 */
+            border-radius: 8px; /* 按钮圆角 */
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 过渡效果 */
+            cursor: pointer;
+            border: none; /* 移除默认边框 */
+        }
+
+        /* 客户端按钮特定样式 */
+        .client-btn {
+            background-color: #4CAF50; /* 鲜明绿色 */
+            color: white;
+        }
+
+        .client-btn:hover {
+            background-color: #45a049; /* 悬停时深一点的绿色 */
+            transform: translateY(-2px); /* 轻微上移效果 */
+        }
+
+        /* 管理端按钮特定样式 */
+        .admin-btn {
+            background-color: #5cb85c; /* 稍浅一些的绿色，或与客户端按钮同色 */
+            color: white;
+        }
+
+        .admin-btn:hover {
+            background-color: #4cae4c; /* 悬停时深一点的绿色 */
+            transform: translateY(-2px); /* 轻微上移效果 */
+        }
+
+        .button:active {
+            transform: translateY(0px); /* 点击时恢复原位，产生按压感 */
+        }
+
+        /* 学生信息样式 */
+        .student-info {
+            margin-top: 20px; /* 与容器顶部间距 */
+            font-size: 0.9em;
+            color: #555; /* 灰色文字 */
+        }
+
+        /* 响应式调整：小屏幕上标题字号减小 */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .button {
+                padding: 12px 25px;
+                font-size: 1em;
+                display: block; /* 在小屏幕上按钮堆叠 */
+                width: 80%;
+                margin: 10px auto; /* 居中 */
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>课程作品展示</h1>
+
+    <div class="button-container">
+        <a href="zhuye.html" class="button client-btn">客户端</a>
+        <a href="main.html" class="button admin-btn">管理端</a>
+    </div>
+
+    <div class="student-info">
+        <p>学号：2022212202</p>
+        <p>姓名：ZJL</p>
+    </div>
+</div>
+
+</body>
+</html>
