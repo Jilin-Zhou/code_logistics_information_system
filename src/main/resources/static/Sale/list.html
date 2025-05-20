@@ -25,6 +25,34 @@
     openSocket();
 
     $(function() {
+        $('#guPid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/gu/getGu',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#yuanPid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'sno',title:'编号',width : 60},
+                {field:'sname',title:'名称',align:'center'},
+                {field:'phone',title:'联系方式',width : 160},
+                {field:'address',title:'地址',width : 160},
+            ]],
+        });
         $('#yuanPid').combogrid({
             panelWidth:380,
             panelHeight:450,
@@ -118,8 +146,8 @@
                         width : 180,
                         sortable : true,
                         align : "center",
-                    },{	field : 'addition',
-                        title : '备注',
+                    },{	field : 'guName',
+                        title : '顾客名',
                         width : 180,
                         sortable : true,
                         align : "center",
@@ -190,8 +218,9 @@
             // 参数名与后台pojo属性名一致即可自动填充
             // 'canID' : $('#canID').combobox('getValue'),
             'sno' : $('#sno').val(),
-            'cangPid' : $('#cangPid').combogrid('getValue'),
-            'yuanPid' : $('#yuanPid').combogrid('getValue'),
+            // 'cangPid' : $('#cangPid').combogrid('getValue'),
+            // 'yuanPid' : $('#yuanPid').combogrid('getValue'),
+            'guPid' : $('#guPid').combogrid('getValue'),
             // 支持级联属性填充
             'start' :  $('#start').datetimebox('getValue'),
             'end' :  $('#end').datetimebox('getValue')
@@ -220,9 +249,10 @@
 
     function clearSearch() {
         $('#dataGrid').datagrid('load', {});
-        $('#canID').combobox('setValue','');
+        $('#sno').val('');
         $('#cangPid').combogrid('setValue','');
         $('#yuanPid').combogrid('setValue','');
+        $('#guPid').combogrid('setValue','');
         $('#start').datetimebox('setValue','');
         $('#end').datetimebox('setValue','');
     }
@@ -406,6 +436,7 @@
             <table>
                 <tr>
                     <td>销售单号：</td><td><input id="sno" name="sno" ></td>
+                    <td>顾客：</td><td><input id="guPid" name="guPid" ></td>
                     <td><a href="javascript:void(0)" class="easyui-linkbutton"
                            plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;
                         <a href="javascript:void(0)" class="easyui-linkbutton"

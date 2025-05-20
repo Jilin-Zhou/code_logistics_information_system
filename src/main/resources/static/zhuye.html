@@ -463,6 +463,81 @@
         .logout-button:hover {
             background-color: #45a049;
         }
+
+        /* 搜索自动补全下拉框样式 */
+        .search-container {
+            position: relative;
+            flex: 1;
+        }
+        .search-input {
+            width: 100%;
+            padding: 8px 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 4px 0 0 4px;
+            font-size: 14px;
+        }
+        .search-autocomplete {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        .autocomplete-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .autocomplete-item:hover {
+            background-color: #f5f5f5;
+        }
+        .autocomplete-item .highlight {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .autocomplete-item .item-details {
+            display: flex;
+            align-items: center;
+        }
+        .autocomplete-item .item-image {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .autocomplete-item .item-info {
+            flex: 1;
+        }
+        .autocomplete-item .item-title {
+            font-weight: bold;
+        }
+        .autocomplete-item .item-price {
+            color: #ff4444;
+            font-size: 12px;
+        }
+        /* 个人中心按钮样式 */
+        .profile-button {
+            padding: 5px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+        .profile-button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <script type="text/javascript" src="../../easyUI/jquery.js"></script>
@@ -479,7 +554,10 @@
     <div class="header-content">
         <div class="logo">图书商城</div>
         <div class="search-box">
-            <input type="text" class="search-input" placeholder="搜索图书...">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="搜索图书..." id="search-input">
+                <div class="search-autocomplete" id="search-autocomplete"></div>
+            </div>
             <button class="search-button">搜索</button>
         </div>
 
@@ -544,12 +622,12 @@
     let username = null;  // 用户名
 
     // 页面初始化函数
-    async function init() {
-        await checkLoginStatus();  // 检查登录状态
-        await loadBooks();  // 加载图书数据
-        displayBooks();  // 显示图书列表
-        updateCart();  // 更新购物车
-    }
+    // async function init() {
+    //     await checkLoginStatus();  // 检查登录状态
+    //     await loadBooks();  // 加载图书数据
+    //     displayBooks();  // 显示图书列表
+    //     updateCart();  // 更新购物车
+    // }
 
     // 检查登录状态
     async function checkLoginStatus() {
@@ -574,22 +652,63 @@
         window.location.reload();  // 刷新页面
     }
 
+    // // 更新用户信息显示
+    // function updateUserInfo() {
+    //     const userInfoDiv = document.getElementById('user-info');
+    //     userInfoDiv.innerHTML = '';  // 清空原有内容
+    //
+    //     if (isLoggedIn) {
+    //         // 如果已登录，显示用户名和退出按钮
+    //         const usernameSpan = document.createElement('span');
+    //         usernameSpan.textContent = `欢迎您，${username}！`;
+    //         userInfoDiv.appendChild(usernameSpan);
+    //
+    //         const logoutButton = document.createElement('button');
+    //         logoutButton.textContent = '退出';
+    //         logoutButton.classList.add('logout-button');
+    //         logoutButton.onclick = logout;
+    //         userInfoDiv.appendChild(logoutButton);
+    //     } else {
+    //         // 如果未登录，显示登录按钮
+    //         const loginButton = document.createElement('button');
+    //         loginButton.textContent = '登录';
+    //         loginButton.classList.add('login-button');
+    //         loginButton.onclick = () => {
+    //             window.location.href = 'http://localhost:8888/login.html';
+    //         };
+    //         userInfoDiv.appendChild(loginButton);
+    //     }
+    // }
+
     // 更新用户信息显示
     function updateUserInfo() {
         const userInfoDiv = document.getElementById('user-info');
         userInfoDiv.innerHTML = '';  // 清空原有内容
 
         if (isLoggedIn) {
-            // 如果已登录，显示用户名和退出按钮
+            // 如果已登录，显示用户名、个人中心按钮和退出按钮
             const usernameSpan = document.createElement('span');
             usernameSpan.textContent = `欢迎您，${username}！`;
             userInfoDiv.appendChild(usernameSpan);
 
+            // 添加按钮容器
+            const buttonContainer = document.createElement('div');
+            buttonContainer.classList.add('user-controls');
+            userInfoDiv.appendChild(buttonContainer);
+
+            // 添加个人中心按钮
+            const profileButton = document.createElement('button');
+            profileButton.textContent = '个人中心';
+            profileButton.classList.add('profile-button');
+            profileButton.onclick = goToUserCenter;
+            buttonContainer.appendChild(profileButton);
+
+            // 添加退出按钮
             const logoutButton = document.createElement('button');
             logoutButton.textContent = '退出';
             logoutButton.classList.add('logout-button');
             logoutButton.onclick = logout;
-            userInfoDiv.appendChild(logoutButton);
+            buttonContainer.appendChild(logoutButton);
         } else {
             // 如果未登录，显示登录按钮
             const loginButton = document.createElement('button');
@@ -601,6 +720,134 @@
             userInfoDiv.appendChild(loginButton);
         }
     }
+
+    // 跳转到用户中心
+    function goToUserCenter() {
+        window.location.href = 'http://localhost:8888/user_center.html';
+    }
+
+    // 搜索自动补全功能
+    function setupSearchAutocomplete() {
+        const searchInput = document.getElementById('search-input');
+        const autocompleteContainer = document.getElementById('search-autocomplete');
+
+        // 当输入框内容变化时触发
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.trim().toLowerCase();
+
+            // 如果搜索词为空，隐藏自动补全框
+            if (!searchTerm) {
+                autocompleteContainer.style.display = 'none';
+                return;
+            }
+
+            // 筛选匹配的图书
+            const matchingBooks = books.filter(book =>
+                book.sname.toLowerCase().includes(searchTerm)
+            );
+
+            // 如果有匹配结果，显示自动补全框
+            if (matchingBooks.length > 0) {
+                // 构建自动补全列表HTML
+                const autocompleteHTML = matchingBooks.slice(0, 5).map(book => {
+                    // 高亮匹配的文本
+                    const highlightedName = book.sname.replace(
+                        new RegExp(searchTerm, 'gi'),
+                        match => `<span class="highlight">${match}</span>`
+                    );
+
+                    return `
+                        <div class="autocomplete-item" data-id="${book.id}">
+                            <div class="item-details">
+                                <img src="${book.picurl || 'placeholder.jpg'}" class="item-image" alt="${book.sname}">
+                                <div class="item-info">
+                                    <div class="item-title">${highlightedName}</div>
+                                    <div class="item-price">￥${book.sprice}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // 更新自动补全容器内容
+                autocompleteContainer.innerHTML = autocompleteHTML;
+                autocompleteContainer.style.display = 'block';
+
+                // 为每个自动补全项添加点击事件
+                document.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const bookId = parseInt(this.dataset.id);
+                        const selectedBook = books.find(book => book.id === bookId);
+
+                        // 在输入框中填入完整书名
+                        searchInput.value = selectedBook.sname;
+
+                        // 隐藏自动补全框
+                        autocompleteContainer.style.display = 'none';
+
+                        // 显示选中的图书
+                        displayBooks([selectedBook]);
+                    });
+                });
+            } else {
+                // 没有匹配结果时显示提示
+                autocompleteContainer.innerHTML = '<div class="autocomplete-item">没有匹配的图书</div>';
+                autocompleteContainer.style.display = 'block';
+            }
+        });
+
+        // 点击页面其他位置时隐藏自动补全框
+        document.addEventListener('click', function(event) {
+            if (!searchInput.contains(event.target) && !autocompleteContainer.contains(event.target)) {
+                autocompleteContainer.style.display = 'none';
+            }
+        });
+
+        // 按下ESC键时隐藏自动补全框
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                autocompleteContainer.style.display = 'none';
+            }
+        });
+    }
+    // 修改搜索功能
+    function setupSearchButton() {
+        document.querySelector('.search-button').addEventListener('click', () => {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            performSearch(searchTerm);
+        });
+
+        // 添加回车搜索功能
+        document.getElementById('search-input').addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                const searchTerm = document.getElementById('search-input').value.toLowerCase();
+                performSearch(searchTerm);
+            }
+        });
+    }
+
+    // 执行搜索
+    function performSearch(searchTerm) {
+        if (searchTerm) {
+            const searchResults = books.filter(book =>
+                book.sname.toLowerCase().includes(searchTerm)
+            );
+
+            // 隐藏自动补全框
+            document.getElementById('search-autocomplete').style.display = 'none';
+
+            if (searchResults.length > 0) {
+                displayBooks(searchResults);
+            } else {
+                // 没有搜索结果时显示提示
+                const booksGrid = document.querySelector('.books-grid');
+                booksGrid.innerHTML = '<div class="no-results">没有找到匹配的图书</div>';
+            }
+        } else {
+            displayBooks();
+        }
+    }
+
 
     // 加载图书数据
     async function loadBooks() {
@@ -793,8 +1040,19 @@
         open_page(url, param);
     }
 
+    // 页面初始化函数
+    async function init() {
+        await checkLoginStatus();  // 检查登录状态
+        await loadBooks();  // 加载图书数据
+        displayBooks();  // 显示图书列表
+        updateCart();  // 更新购物车
+        setupSearchAutocomplete();  // 设置搜索自动补全
+        setupSearchButton();  // 设置搜索按钮
+    }
+
     // 页面加载时初始化
     window.addEventListener('load', init);
+
 </script>
 </body>
 </html>

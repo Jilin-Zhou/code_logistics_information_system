@@ -47,25 +47,29 @@
                     striped : true,// 隔行变色
                     idField : 'id', // 主键字段
                     pageList : [ 30, 50, 100, 1000, 2000 ],
-                    frozenColumns : [ [ {
-                        field : 'id',
-                        title : 'ID',
-                        align : 'center',
-                        hidden: true,
-                        width : 50,
-                    }, {
-                        field : 'sno',
-                        title : '图书编码',
-                        width : 70,
-                        sortable : true,
-                        editor : {
-                            type : 'validatebox',
-                            options : {
-                                required : false
-                            }
-                        }
-                    } ] ],
+                    frozenColumns : [ [
+
+                    ] ],
                     columns : [ [
+                        {
+                            field : 'id',
+                            title : 'ID',
+                            align : 'center',
+                            hidden: true,
+                            width : 50,
+                        },
+                        {
+                            field : 'sno',
+                            title : '图书编码',
+                            width : 70,
+                            sortable : true,
+                            editor : {
+                                type : 'validatebox',
+                                options : {
+                                    required : false
+                                }
+                            }
+                        },
                         {
                             field : 'sname',
                             title : '图书名称',

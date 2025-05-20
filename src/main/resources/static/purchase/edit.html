@@ -341,8 +341,8 @@
       }
     })
 
-    $('w').window({
-      onBeforeClose: function(){
+    $('#w').window({
+      onBeforeClose:function () {
         window.close();
         return false;
       }
@@ -455,7 +455,7 @@
     let deleted = dataGrid.datagrid('getChanges', 'deleted');
 
     if (inserted.length > 0 || updated.length >0 || deleted.length > 0){
-      parent.$.messager.confirm('询问', '您是否要新增当前采购单？', function(b) {
+      parent.$.messager.confirm('询问', '您是否要更新当前采购单？', function(b) {
         if (b) {
           parent.$.messager.progress({
             title: '提示',

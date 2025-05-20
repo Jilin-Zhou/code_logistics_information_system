@@ -54,7 +54,7 @@ public class PurchasePlanServiceImpl extends BaseServiceImpl<PurchasePlan, Integ
                 Goods goods = goodsDao.find(d.getGoodsPid());
                 purchasePlanDetail.setGoods(goods);
                 BeanUtils.copyProperties(d,purchasePlanDetail, "purchasePlanPid","goodsPid");
-                purchasePlanDetailDao.persist(purchasePlanDetail);
+                purchasePlanDetailDao.merge(purchasePlanDetail);
             }
 
         }
@@ -84,6 +84,7 @@ public class PurchasePlanServiceImpl extends BaseServiceImpl<PurchasePlan, Integ
                 Goods goods = goodsDao.find(d.getGoodsPid());
                 purchasePlanDetail.setGoods(goods);
                 purchasePlanDetail.setPurchasePlan(purchasePlan);
+                purchasePlanDetail.setAlreadyNum(0);
                 BeanUtils.copyProperties(d, purchasePlanDetail, "purchasePlanPid", "goodsPid");
                 purchasePlanDetailSet.add(purchasePlanDetail);
             }

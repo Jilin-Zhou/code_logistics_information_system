@@ -11,7 +11,7 @@ public class IndexController {
     public String index(){
 
 //        return "forward:/main.html";
-        return "forward:/zhuye.html";
+        return "forward:/guide.html";
     }
 
 }

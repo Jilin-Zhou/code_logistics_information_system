@@ -1,12 +1,16 @@
 package org.example.controller;
 
 import org.example.pageModel.Json;
+import org.example.pojo.Gu;
 import org.example.pojo.Login;
 import org.example.service.LoginService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import javax.activation.DataSource;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.annotation.Resource;
@@ -62,6 +66,36 @@ public class LoginController {
 
         return json;
     }
+
+
+    @Transactional
+    @PostMapping("/add-customer")
+    public Json addCustomer(@RequestBody Gu customerInfo) {
+        Json json = new Json();
+        try {
+            // 创建顾客实体对象
+            Gu customer = new Gu();
+            customer.setSname(customerInfo.getSname());
+            customer.setAddress(customerInfo.getAddress());
+            customer.setPhone(customerInfo.getPhone());
+            customer.setAddition(customerInfo.getAddition());
+
+            // 使用EntityManager持久化对象
+            entityManager.persist(customer);
+            entityManager.flush(); // 立即刷新到数据库
+
+            json.setSuccess(true);
+            json.setMsg("顾客信息添加成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setSuccess(false);
+            json.setMsg("顾客信息添加失败: " + e.getMessage());
+        }
+        return json;
+    }
+
+
+
 
     // 修改信息
     @PutMapping("/update")

@@ -130,11 +130,19 @@ public class SaleCtrl {
     SaleWebSocket saleWebSocket;
 
     @RequestMapping("/getData")
-    public Page<Sale> getData(Pageable page, Sale sale, String start, String end,Integer cangPid,Integer yuanPid){
+    public Page<Sale> getData(Pageable page, Sale sale, String start, String end,Integer cangPid,Integer yuanPid, Integer guPid){
         page.setOrderProperty("createTime");
         page.setOrderDirection(Order.Direction.desc);
 
         List<Filter> filters = new ArrayList<>();
+        if(guPid!=null){
+            Filter ft = new Filter();
+            ft.setProperty("gu");
+            ft.setValue(guPid);
+            ft.setOperator(Filter.Operator.eq);
+            filters.add(ft);
+
+        }
         if (cangPid!=null){
             Filter ft = new Filter();
             ft.setProperty("cang");
@@ -239,7 +247,7 @@ public class SaleCtrl {
                      @RequestParam(value = "inserted", required = false) String inserted,
                      @RequestParam(value = "updated", required = false) String updated,
                      @RequestParam(value = "deleted", required = false) String deleted,
-                     Integer cangPid,Integer yuanPid)
+                     Integer cangPid,Integer yuanPid, Integer guPid)
     {
         Json json = new Json();
         List<SaleDetailDto> lstInserted = new ArrayList<>();
@@ -259,6 +267,11 @@ public class SaleCtrl {
 
         String errStr="";
         try {
+            if(guPid != null){
+                Gu gu = new Gu();
+                gu.setId(guPid);
+                sale.setGu(gu);
+            }
             if (cangPid != null) {
                 Cang cang = new Cang();
                 cang.setId(cangPid);
@@ -289,7 +302,7 @@ public class SaleCtrl {
     public Json add(Sale sale,
                     @RequestParam(value = "inserted", required = false) String inserted,
                     @RequestParam(value = "updated", required = false) String updated,
-                    Integer cangPid,Integer yuanPid)
+                    Integer cangPid,Integer yuanPid, Integer guPid)
     {
         Json json = new Json();
         List<SaleDetailDto> lstInserted = new ArrayList<>();
@@ -308,6 +321,11 @@ public class SaleCtrl {
         String errStr="";
 
         try {
+            if (guPid != null){
+                Gu gu = new Gu();
+                gu.setId(guPid);
+                sale.setGu(gu);
+            }
             if (cangPid != null) {
                 Cang cang = new Cang();
                 cang.setId(cangPid);

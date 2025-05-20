@@ -415,8 +415,8 @@
             <input type="text" id="sno" class="form-control" readonly>
           </div>
           <div class="form-col">
-            <label class="form-label" for="guPid">收货人</label>
-            <input type="text" id="guPid" class="form-control">
+            <label class="form-label" for="guName">收货人</label>
+            <input type="text" id="guName" class="form-control">
           </div>
         </div>
       </div>
@@ -505,6 +505,7 @@
   let currentPage = 1;
   let pageSize = 10;
   let totalItems = 0;
+  let guPid; // 新增变量，用于存储顾客ID
 
   // 解析URL参数
   function getUrlParams() {
@@ -565,7 +566,7 @@
         data: {'id': id},
         success: function(result) {
           $('#sno').val(result.sno);
-          $('#guPid').val(result.guPid);
+          $('#guName').val(result.guName);
           $('#dueDate').val(result.dueDate);
           $('#addition').val(result.addition);
           $('#order-status').text('修改中');
@@ -636,7 +637,7 @@
 
         // 设置用户名
         if (checkoutData.username) {
-          $('#guPid').val(checkoutData.username);
+          $('#guName').val(checkoutData.username);
         }
 
         // 添加购物车商品到订单明细
@@ -880,70 +881,169 @@
     showToast(`已删除 ${selectedIds.length} 条记录`);
   }
 
+  // 新增函数：根据顾客名称获取顾客ID
+  function getGuPidByName(guName) {
+    return new Promise((resolve, reject) => {
+      if (!guName) {
+        reject('顾客名称不能为空');
+        return;
+      }
+
+      $.ajax({
+        type: "POST",
+        url: httphost + "/gu/getGuPidByName",
+        data: {'guName': guName},
+        success: function(result) {
+          if (result && result.success) {
+            guPid = result.obj; // 存储顾客ID
+            resolve(result.obj);
+          } else {
+            reject(result.msg || '未找到该顾客');
+          }
+        },
+        error: function(xhr, status, error) {
+          reject('查询顾客ID失败: ' + error);
+        }
+      });
+    });
+  }
+
   // 提交订单
+  // function submitOrder() {
+  //   // 确保结束当前可能在编辑的行
+  //   if (editingRowIndex !== -1) {
+  //     endEditingRow();
+  //   }
+  //
+  //   if (orderDetails.length === 0) {
+  //     showToast('订单明细不能为空', 'danger');
+  //     return;
+  //   }
+  //
+  //   if (!confirm('您确定要提交当前销售订单吗？')) {
+  //     return;
+  //   }
+  //
+  //   // 处理要插入的新数据，移除临时id
+  //   const insertedItems = orderDetails
+  //           .filter(item => String(item.id).startsWith('temp_'))
+  //           .map(item => {
+  //             // 创建item的副本并删除id字段
+  //             const newItem = {...item};
+  //             delete newItem.id;
+  //             return newItem;
+  //           });
+  //
+  //   // 处理要更新的数据
+  //   const updatedItems = orderDetails.filter(item => !String(item.id).startsWith('temp_'));
+  //
+  //
+  //   // 提取表单数据
+  //   const saleDto = {
+  //     'id': id,
+  //     'sno': $('#sno').val(),
+  //     'addition': $('#addition').val(),
+  //     'guName': $('#guName').val(),
+  //     'dueDate': $('#dueDate').val(),
+  //     'inserted': JSON.stringify(insertedItems),
+  //     'updated': JSON.stringify(updatedItems),
+  //     'deleted': JSON.stringify([]) // 已在前端删除
+  //   };
+  //
+  //   $.ajax({
+  //     type: "POST",
+  //     url: httphost + '/sale/add',
+  //     data: saleDto,
+  //     dataType: 'json',
+  //     success: function(response) {
+  //       if (response && response.success) {
+  //         showToast(response.msg || '订单提交成功', 'success');
+  //         setTimeout(() => {
+  //           // 清除localStorage中的数据
+  //           localStorage.removeItem('checkoutData');
+  //           // 关闭当前页面
+  //           window.close();
+  //         }, 2000);
+  //       } else {
+  //         showToast(response.msg || '订单提交失败', 'danger');
+  //       }
+  //     },
+  //     error: function() {
+  //       showToast('服务器错误，请稍后再试', 'danger');
+  //     }
+  //   });
+  // }
+
+  // 修改提交订单函数
   function submitOrder() {
     // 确保结束当前可能在编辑的行
     if (editingRowIndex !== -1) {
       endEditingRow();
     }
-
     if (orderDetails.length === 0) {
       showToast('订单明细不能为空', 'danger');
       return;
     }
-
     if (!confirm('您确定要提交当前销售订单吗？')) {
       return;
     }
-
-    // 处理要插入的新数据，移除临时id
-    const insertedItems = orderDetails
-            .filter(item => String(item.id).startsWith('temp_'))
-            .map(item => {
-              // 创建item的副本并删除id字段
-              const newItem = {...item};
-              delete newItem.id;
-              return newItem;
+    const guName = $('#guName').val();
+    if (!guName) {
+      showToast('收货人不能为空', 'danger');
+      return;
+    }
+    // 先获取顾客ID，然后再提交订单
+    getGuPidByName(guName)
+            .then(guPidValue => {
+              // 处理要插入的新数据，移除临时id
+              const insertedItems = orderDetails
+                      .filter(item => String(item.id).startsWith('temp_'))
+                      .map(item => {
+                        // 创建item的副本并删除id字段
+                        const newItem = {...item};
+                        delete newItem.id;
+                        return newItem;
+                      });
+              // 处理要更新的数据
+              const updatedItems = orderDetails.filter(item => !String(item.id).startsWith('temp_'));
+              // 提取表单数据
+              const saleDto = {
+                'id': id,
+                'sno': $('#sno').val(),
+                'addition': $('#addition').val(),
+                'guPid': guPidValue, // 使用查询到的顾客ID
+                'dueDate': $('#dueDate').val(),
+                'inserted': JSON.stringify(insertedItems),
+                'updated': JSON.stringify(updatedItems),
+                'deleted': JSON.stringify([]) // 已在前端删除
+              };
+              console.log(saleDto);
+              $.ajax({
+                type: "POST",
+                url: httphost + '/sale/add',
+                data: saleDto,
+                dataType: 'json',
+                success: function(response) {
+                  if (response && response.success) {
+                    showToast(response.msg || '订单提交成功', 'success');
+                    setTimeout(() => {
+                      // 清除localStorage中的数据
+                      localStorage.removeItem('checkoutData');
+                      // 关闭当前页面
+                      window.close();
+                    }, 2000);
+                  } else {
+                    showToast(response.msg || '订单提交失败', 'danger');
+                  }
+                },
+                error: function() {
+                  showToast('服务器错误，请稍后再试', 'danger');
+                }
+              });
+            })
+            .catch(error => {
+              showToast(error, 'danger');
             });
-
-    // 处理要更新的数据
-    const updatedItems = orderDetails.filter(item => !String(item.id).startsWith('temp_'));
-
-
-    // 提取表单数据
-    const saleDto = {
-      'id': id,
-      'sno': $('#sno').val(),
-      'addition': $('#addition').val(),
-      'guPid': $('#guPid').val(),
-      'dueDate': $('#dueDate').val(),
-      'inserted': JSON.stringify(insertedItems),
-      'updated': JSON.stringify(updatedItems),
-      'deleted': JSON.stringify([]) // 已在前端删除
-    };
-
-    $.ajax({
-      type: "POST",
-      url: httphost + '/sale/add',
-      data: saleDto,
-      dataType: 'json',
-      success: function(response) {
-        if (response && response.success) {
-          showToast(response.msg || '订单提交成功', 'success');
-          setTimeout(() => {
-            // 清除localStorage中的数据
-            localStorage.removeItem('checkoutData');
-            // 关闭当前页面
-            window.close();
-          }, 2000);
-        } else {
-          showToast(response.msg || '订单提交失败', 'danger');
-        }
-      },
-      error: function() {
-        showToast('服务器错误，请稍后再试', 'danger');
-      }
-    });
   }
 
   // 暂存订单
@@ -955,7 +1055,7 @@
 
     // 由于我们需要完全替换localStorage中的数据，创建新的结构
     const checkoutData = {
-      username: $('#guPid').val(),
+      username: $('#guName').val(),
       cartItems: orderDetails.map(item => ({
         id: item.goodsPid || item.id,
         goodsName: item.goodsName,

@@ -23,8 +23,8 @@ public class Sale extends BaseEntity implements Serializable {
     @Column(name = "addition")
     String addition;   //附加说明
 
-    @Column(name = "guPid")
-    String guPid;   //附加说明
+//    @Column(name = "guPid")
+//    String guPid;   //附加说明
 
     @Column(name = "phone")
     String phone;
@@ -48,6 +48,11 @@ public class Sale extends BaseEntity implements Serializable {
     @ManyToOne(targetEntity=Yuan.class,fetch = FetchType.LAZY)
     @JsonIgnore
     Yuan yuan;
+
+    @JoinColumn(name="guPid")
+    @ManyToOne(targetEntity=Gu.class,fetch = FetchType.LAZY)
+    @JsonIgnore
+    Gu gu;
 
     @Transient
     public String getCangName(){
@@ -78,6 +83,25 @@ public class Sale extends BaseEntity implements Serializable {
         if (yuan!=null) {
             if (yuan.getId() != null){
                 return yuan.getId();
+            }
+        }
+        return null;
+    }
+
+    @Transient
+    public String getGuName(){
+        if (gu!=null) {
+            if (gu.getId() != null){
+                return gu.getSname();
+            }
+        }
+        return "";
+    }
+
+    public Integer getGuPid(){
+        if (gu!=null) {
+            if (gu.getId() != null){
+                return gu.getId();
             }
         }
         return null;

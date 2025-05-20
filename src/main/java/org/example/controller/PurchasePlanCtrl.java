@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 
 @RestController
@@ -57,11 +58,25 @@ public class PurchasePlanCtrl {
     PurchasePlanWebSocket purchasePlanWebSocket;
 
     @RequestMapping("/getData")
-    public Page<PurchasePlan> getData(Pageable page, PurchasePlan purchasePlan, String start, String end){
+    public Page<PurchasePlan> getData(Pageable page, PurchasePlan purchasePlan, String start, String end, Integer cangPid,Integer yuanPid){
         page.setOrderProperty("createTime");
         page.setOrderDirection(Order.Direction.desc);
 
         List<Filter> filters = new ArrayList<>();
+        if (cangPid!=null){
+            Filter ft = new Filter();
+            ft.setProperty("cang");
+            ft.setValue(cangPid);
+            ft.setOperator(Filter.Operator.eq);
+            filters.add(ft);
+        }
+        if (yuanPid!=null){
+            Filter ft = new Filter();
+            ft.setProperty("yuan");
+            ft.setValue(yuanPid);
+            ft.setOperator(Filter.Operator.eq);
+            filters.add(ft);
+        }
 
         addStartAndEndRestrict(start, end, filters);
         page.setFilters(filters);
@@ -190,7 +205,8 @@ public class PurchasePlanCtrl {
                 return  json;
             }
         }catch (Exception e){
-           errStr = e.getMessage();
+           e.printStackTrace();
+            errStr = getRootCauseMessage(e);
         }
         json.setSuccess(false);
         json.setMsg("采购计划单更新失败！\n\n" + errStr);
@@ -245,7 +261,7 @@ public class PurchasePlanCtrl {
             e.printStackTrace();
         }
         json.setSuccess(false);
-        json.setMsg("采购计划单更新失败！\n\n" + errStr);
+        json.setMsg("新增采购计划单失败！\n\n" + errStr);
         return json;
     }
 

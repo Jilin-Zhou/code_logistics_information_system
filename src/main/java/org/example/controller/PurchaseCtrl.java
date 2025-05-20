@@ -58,7 +58,7 @@ public class PurchaseCtrl {
 
     @RequestMapping("/getData")
     public Page<Purchase> getData(Pageable page, Purchase purchase, String start, String end,Integer gongPid,Integer cangPid,Integer yuanPid){
-        page.setOrderProperty("updateTime");
+        page.setOrderProperty("createTime");
         page.setOrderDirection(Order.Direction.desc);
 
         List<Filter> filters = new ArrayList<>();

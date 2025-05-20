@@ -25,6 +25,61 @@
     openSocket();
 
     $(function() {
+        $('#yuanPid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/yuan/getYuan',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#yuanPid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'sno',title:'编号',width : 60},
+                {field:'sname',title:'名称',align:'center'},
+                {field:'addition',title:'联系方式',width : 160},
+                {field:'department',title:'部门',width : 160},
+            ]],
+        });
+        $('#cangPid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/cang/getCang',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#cangPid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#cangPid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'sno',title:'编号',width : 60},
+                {field:'sname',title:'名称',align:'center'},
+                {field:'addition',title:'描述',width : 160},
+            ]],
+        });
         editrow = 'undefined'; //行编辑开关
         dataGrid = $('#dataGrid')
             .datagrid({
@@ -69,7 +124,7 @@
                         sortable : true,
                         align : "center",
                     },{	field : 'cangAddition',
-                        title : '仓库地址',
+                        title : '仓库',
                         width : 180,
                         sortable : true,
                         align : "center",
@@ -106,6 +161,7 @@
                     $(this).datagrid('tooltip');
                 },
             });
+
         $('#canID').combobox({
             valueField:'canID',
             textField:'canID',
@@ -122,33 +178,35 @@
             // 参数名与后台pojo属性名一致即可自动填充
             // 'canID' : $('#canID').combobox('getValue'),
             'sno' : $('#sno').val(),
-            'cangPid' : $('#cangPid').val(),
+            'cangPid':$('#cangPid').combogrid('getValue'),
+            'yuanPid':$('#yuanPid').combogrid('getValue'),
             // 支持级联属性填充
             'start' :  $('#start').datetimebox('getValue'),
             'end' :  $('#end').datetimebox('getValue')
         });
+        // console.log($('#cangPid').combogrid('getValue'));
     }
 
 
     function clearSearch() {
         $('#dataGrid').datagrid('load', {});
         $('#sno').val('');
-        $('#cangPid').val('');
+        $('#cangPid').combogrid('setValue','');
+        $('#yuanPid').combogrid('setValue','');
         // $('#canID').combobox('setValue','');
         $('#start').datetimebox('setValue','');
         $('#end').datetimebox('setValue','');
     }
 
-    function exportExcel(){
 
+    function exportExcel(){
         openBlank('exportExcel', {
             // 'canID' : $('#canID').combobox('getValue'),
             'sno' : $('#sno').val(),
-            'cangPid' : $('#cangPid').val(),
+            'cangPid' : $('#cangPid').combogrid('getValue'), // 这里修改为使用combogrid的getValue方法
             'start' :  $('#start').datetimebox('getValue'),
             'end' :  $('#end').datetimebox('getValue')
-        }) ;
-
+        });
     }
 
     /**
@@ -249,7 +307,8 @@
                 <tr>
                     <td>入库单号：</td><td><input id="sno" name="sno" ></td>
 <!--                    <td>供应商：</td><td><input id="supplier" name="supplier" ></td>-->
-                    <td>仓库地址：</td><td><input id="cangPid" name="cangPid" ></td>
+                    <td>仓库：</td><td><input id="cangPid" name="cangPid" ></td>
+                    <td>仓库管理员：</td><td><input id="yuanPid" name="yuanPid" ></td>
                     <td><a href="javascript:void(0)" class="easyui-linkbutton"
                            plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;
                         <a href="javascript:void(0)" class="easyui-linkbutton"

@@ -190,10 +190,7 @@
 							title : '图书类别',
 							width : 140,
 							align: "center",
-							sortable : true,
-							editor: {
-								type: 'text',
-							}
+							sortable : true
 						},
 					] ],
 					columns : [ [
@@ -252,7 +249,7 @@
 				});
 		afterSuccessLoad();
 
-		$('w').window({
+		$('#w').window({
 			onBeforeClose: function() {
 				window.close();
 				return false;
@@ -382,7 +379,7 @@
 					let purchasePlanDto = {
 						'id' : id,
 						'sno' : $('#sno').val(),
-						'addition' : $('#addition').val('getValue'),
+						'addition' : $('#addition').val(),
 						'cangPid' : $('#cangPid').combogrid('getValue'),
 						'yuanPid' : $('#yuanPid').combogrid('getValue'),
 						'dueDate' : $('#dueDate').datebox('getValue'),

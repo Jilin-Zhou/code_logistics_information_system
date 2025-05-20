@@ -159,12 +159,7 @@
                   width : 80,
                   align: "center",
                   sortable : true,
-                },{
-                  field : 'purchaseDetailPrice',
-                  title : '采购价格',
-                  align : 'center',
-                  width : 80,
-                } ,
+                },
                 {
                   field : 'purchaseDetailAlreadyNum',
                   title : '已入库数量',
@@ -427,7 +422,7 @@
     let deleted = dataGrid.datagrid('getChanges', 'deleted');
 
     if (inserted.length > 0 || updated.length >0 || deleted.length > 0){
-      parent.$.messager.confirm('询问', '您是否要新增当前采购单？', function(b) {
+      parent.$.messager.confirm('询问', '您是否要修改当前入库单？', function(b) {
         if (b) {
           parent.$.messager.progress({
             title: '提示',
@@ -436,8 +431,8 @@
           let entryDto = {
             'id' : id,
             'sno' : $('#sno').val(),
-            'cangPid' : $('#cangPid').val(),
-            'yuanPid' : $('#yuanPid').val(),
+            'cangPid' : $('#cangPid').combogrid('getValue'),
+            'yuanPid' : $('#yuanPid').combogrid('getValue'),
             'dueDate' : $('#dueDate').datebox('getValue'),
             'inserted': JSON.stringify(inserted),
             'updated' : JSON.stringify(updated),

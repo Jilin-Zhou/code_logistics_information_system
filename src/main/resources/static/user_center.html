@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 我的订单</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ... (Your existing CSS here) ... */
+        :root {
+            --primary: #4361ee;
+            --primary-light: #eaefff;
+            --danger: #ef476f;
+            --success: #06d6a0;
+            --dark: #2b2d42;
+            --text: #4f5366;
+            --light-text: #8d99ae;
+            --border: #e9ecef;
+            --bg-light: #f8f9fa;
+            --white: #ffffff;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --radius: 6px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 通用样式 */
+        h1, h2, h3 {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        h2 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .text-muted {
+            color: var(--light-text);
+            font-size: 0.875rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 500;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 50rem;
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* 布局组件 */
+        .container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* 表单组件 */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -0.75rem;
+        }
+
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+            padding: 0 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            color: var(--dark);
+            background-color: var(--white);
+            background-clip: padding-box;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+
+        /* 表格组件 */
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            font-weight: 500;
+            color: var(--text);
+            background-color: var(--bg-light);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: var(--bg-light);
+        }
+
+        .table-row-selected {
+            background-color: var(--primary-light) !important;
+        }
+
+        /* 按钮样式 */
+        .btn-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            line-height: 1.5;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            cursor: pointer;
+            user-select: none;
+            border: 1px solid transparent;
+            border-radius: var(--radius);
+            transition: all 0.2s ease-in-out;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            color: var(--white);
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: #344bd1;
+            border-color: #344bd1;
+        }
+
+        .btn-outline {
+            color: var(--primary);
+            background-color: transparent;
+            border-color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            color: var(--white);
+            background-color: var(--primary);
+        }
+
+        .btn-danger {
+            color: var(--white);
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #d63e60;
+            border-color: #d63e60;
+        }
+
+        .btn-success {
+            color: var(--white);
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #05b389;
+            border-color: #05b389;
+        }
+
+        /* 固定顶部导航栏 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        /* 提示框 */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+        }
+
+        .toast {
+            max-width: 350px;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            background-color: var(--white);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast-danger {
+            border-left: 4px solid var(--danger);
+        }
+
+        /* 分页控件 */
+        .pagination {
+            display: flex;
+            padding-left: 0;
+            list-style: none;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .pagination li {
+            margin: 0 2px;
+        }
+
+        .pagination a {
+            color: var(--dark);
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+        }
+
+        .pagination a:hover {
+            background-color: var(--bg-light);
+        }
+
+        .pagination .active a {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pagination .disabled a {
+            color: var(--light-text);
+            pointer-events: none;
+            background-color: var(--bg-light);
+        }
+
+        /* 操作图标 */
+        .action-icon {
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .action-icon:hover {
+            background-color: var(--bg-light);
+        }
+
+        .action-icon svg {
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+        }
+
+        .icon-view {
+            color: var(--primary);
+        }
+
+        .icon-edit {
+            color: var(--success);
+        }
+
+        .icon-delete {
+            color: var(--danger);
+        }
+
+        /* 状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .status-processing {
+            background-color: rgba(255, 209, 102, 0.1);
+            color: #ff9f1c;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .form-col {
+                min-width: 100%;
+            }
+
+            .btn {
+                padding: 0.4rem 0.75rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <a href="http://localhost:8888/zhuye.html" class="logo">图书商城</a>
+        <div class="user-info">
+            <div class="avatar" id="user-avatar">U</div>
+            <span id="username-display">用户名</span>
+            <button class="btn btn-outline" id="logout-btn">退出</button>
+        </div>
+    </header>
+
+    <h1>个人中心</h1>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>订单查询</h2>
+        </div>
+        <div class="form-group">
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label" for="order-no">订单编号</label>
+                    <input type="text" id="order-no" class="form-control" placeholder="输入订单编号">
+                </div>
+<!--                <div class="form-col">-->
+<!--                    <label class="form-label" for="order-status">订单状态</label>-->
+<!--                    <select id="order-status" class="form-control">-->
+<!--                        <option value="">全部</option>-->
+<!--                        <option value="completed">已完成</option>-->
+<!--                        <option value="processing">进行中</option>-->
+<!--                    </select>-->
+<!--                </div>-->
+            </div>
+            <div class="form-row">
+                <div class="form-col">
+                    <label class="form-label" for="start-date">开始日期</label>
+                    <input type="date" id="start-date" class="form-control">
+                </div>
+                <div class="form-col">
+                    <label class="form-label" for="end-date">结束日期</label>
+                    <input type="date" id="end-date" class="form-control">
+                </div>
+                <div class="form-col" style="display: flex; align-items: flex-end;">
+                    <button id="search-btn" class="btn btn-primary" style="margin-right: 10px;">查询</button>
+                    <button id="reset-btn" class="btn btn-outline">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2>我的订单</h2>
+            <div class="btn-group">
+                <button id="add-order-btn" class="btn btn-primary">新增订单</button>
+                <button id="refresh-btn" class="btn btn-outline">刷新</button>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="order-table" class="table table-hover">
+                <thead>
+                <tr>
+                    <th>订单编号</th>
+                    <th>制单日期</th>
+                    <th>销售日期</th>
+                    <th>顾客名</th>
+                    <th>修改日期</th>
+                    <th>订单状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody id="order-table-body">
+                <tr>
+                    <td colspan="7" class="text-center">加载中...</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="pagination-container">
+            <ul class="pagination" id="pagination">
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container">
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // 全局变量
+    let currentUser = null;
+    let isLoggedIn = false;
+    let orders = [];
+    let currentPage = 1;
+    let pageSize = 10;
+    let totalItems = 0;
+    let httphost = ''; // API路径前缀
+    let currentGuPid = null; // Renamed for clarity: current customer ID
+
+    // 页面加载完成后执行初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        initPage();
+    });
+
+    // 初始化页面
+    async function initPage() {
+        checkLoginStatus();
+        setupEventListeners();
+        // Wait for customer ID before loading orders
+        if (isLoggedIn && currentUser) {
+            try {
+                // Fetch guPid and assign it to currentGuPid
+                currentGuPid = await getGuPidByName(currentUser);
+                await loadOrders();
+            } catch (error) {
+                console.error('Failed to get customer ID:', error);
+                showToast('获取顾客信息失败，请尝试重新登录', 'danger');
+                // Optionally redirect to login or handle error gracefully
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:8888/login.html';
+                }, 2000);
+            }
+        }
+    }
+
+    // 检查登录状态
+    function checkLoginStatus() {
+        const storedUsername = localStorage.getItem('username');
+        if (storedUsername) {
+            isLoggedIn = true;
+            currentUser = storedUsername;
+            updateUserInfo();
+            // No need to set currentGuPid from localStorage here, get it from API
+        } else {
+            // 未登录，重定向到登录页面
+            showToast('请先登录再访问个人中心', 'danger');
+            setTimeout(() => {
+                window.location.href = 'http://localhost:8888/login.html';
+            }, 2000);
+        }
+    }
+
+    // 更新用户信息
+    function updateUserInfo() {
+        document.getElementById('username-display').textContent = currentUser;
+        if (currentUser) {
+            const initial = currentUser.charAt(0).toUpperCase();
+            document.getElementById('user-avatar').textContent = initial;
+        }
+    }
+
+    // 设置事件监听器
+    function setupEventListeners() {
+        // 退出按钮
+        document.getElementById('logout-btn').addEventListener('click', logout);
+
+        // 查询按钮
+        document.getElementById('search-btn').addEventListener('click', function() {
+            currentPage = 1;
+            loadOrders();
+        });
+
+        // 重置按钮
+        document.getElementById('reset-btn').addEventListener('click', resetSearchForm);
+
+        // 新增订单按钮
+        document.getElementById('add-order-btn').addEventListener('click', function() {
+            window.location.href = 'http://localhost:8888/Sale/add.html';
+        });
+
+        // 刷新按钮
+        document.getElementById('refresh-btn').addEventListener('click', function() {
+            loadOrders();
+        });
+    }
+
+    // 退出登录
+    function logout() {
+        localStorage.removeItem('username');
+        localStorage.removeItem('guPid'); // Also remove guPid on logout
+        window.location.href = 'http://localhost:8888/login.html';
+    }
+
+    // 新增函数：根据顾客名称获取顾客ID
+    async function getGuPidByName(guName) {
+        if (!guName) {
+            throw new Error('顾客名称不能为空');
+        }
+
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: "POST",
+                url: httphost + "/gu/getGuPidByName",
+                data: {'guName': guName},
+                success: function(result) {
+                    if (result && result.success) {
+                        localStorage.setItem('guPid', result.obj); // Store guPid in localStorage
+                        resolve(result.obj);
+                    } else {
+                        reject(new Error(result.msg || '未找到该顾客'));
+                    }
+                },
+                error: function(xhr, status, error) {
+                    reject(new Error('查询顾客ID失败: ' + error));
+                }
+            });
+        });
+    }
+
+    // 加载订单数据
+    async function loadOrders() {
+        if (!isLoggedIn) return;
+
+        // Ensure we have currentGuPid before proceeding
+        if (!currentGuPid) {
+            showToast('无法获取顾客ID，请刷新页面或重新登录', 'danger');
+            return;
+        }
+
+        showLoadingIndicator();
+
+        try {
+            // 获取查询参数
+            const params = getSearchParams();
+            params.page = currentPage;
+            params.rows = pageSize;
+            params.guPid = currentGuPid; // 只查询当前用户的订单
+
+            // 构建查询字符串
+            const queryString = Object.keys(params)
+                .filter(key => params[key] !== '')
+                .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
+                .join('&');
+            console.log("Fetching orders with:", queryString);
+
+            // 发送请求
+            const response = await fetch(`${httphost}/sale/getData?${queryString}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // 处理响应数据
+            if (data && data.rows) {
+                orders = data.rows;
+                totalItems = data.total || 0;
+            } else {
+                orders = Array.isArray(data) ? data : [];
+                totalItems = orders.length;
+            }
+
+            renderOrderTable();
+            renderPagination();
+        } catch (error) {
+            console.error('加载订单数据失败:', error);
+            showToast('加载订单数据失败，请稍后重试', 'danger');
+        }
+    }
+
+    // 获取查询参数
+    function getSearchParams() {
+        return {
+            'sno': document.getElementById('order-no').value,
+            // 'status': document.getElementById('order-status').value,
+            'start': document.getElementById('start-date').value,
+            'end': document.getElementById('end-date').value
+        };
+    }
+
+    // 重置查询表单
+    function resetSearchForm() {
+        document.getElementById('order-no').value = '';
+        // document.getElementById('order-status').value = '';
+        document.getElementById('start-date').value = '';
+        document.getElementById('end-date').value = '';
+
+        // 重新加载数据
+        currentPage = 1;
+        loadOrders();
+    }
+
+    // 显示加载指示器
+    function showLoadingIndicator() {
+        const tableBody = document.getElementById('order-table-body');
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">加载中...</td></tr>';
+    }
+
+    // 渲染订单表格
+    // function renderOrderTable() {
+    //     const tableBody = document.getElementById('order-table-body');
+    //     tableBody.innerHTML = '';
+    //
+    //     if (orders.length === 0) {
+    //         tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">暂无订单数据</td></tr>';
+    //         return;
+    //     }
+    //
+    //     orders.forEach(order => {
+    //         const tr = document.createElement('tr');
+    //
+    //         // 订单状态样式
+    //         const statusClass = order.status === 'completed' ? 'status-completed' : 'status-processing';
+    //         const statusText = order.status === 'completed' ? '已完成' : '进行中';
+    //
+    //         tr.innerHTML = `
+    //     <td>${order.sno || '-'}</td>
+    //     <td>${order.createTime || '-'}</td>
+    //     <td>${order.dueDate || '-'}</td>
+    //     <td>${order.guName || '-'}</td>
+    //     <td>${order.updateTime || '-'}</td>
+    //     <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+    //     <td>
+    //       <div class="btn-group">
+    //         <span class="action-icon icon-view" title="查看详情" onclick="viewOrderDetails('${order.id}')">
+    //           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    //             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+    //             <circle cx="12" cy="12" r="3"></circle>
+    //           </svg>
+    //         </span>
+    //         <span class="action-icon icon-edit" title="编辑订单" onclick="editOrder('${order.id}')">
+    //           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    //             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+    //             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+    //           </svg>
+    //         </span>
+    //         <span class="action-icon icon-delete" title="删除订单" onclick="deleteOrder('${order.id}')">
+    //           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    //             <polyline points="3 6 5 6 21 6"></polyline>
+    //             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+    //             <line x1="10" y1="11" x2="10" y2="17"></line>
+    //             <line x1="14" y1="11" x2="14" y2="17"></line>
+    //           </svg>
+    //         </span>
+    //       </div>
+    //     </td>
+    //   `;
+    //
+    //         tableBody.appendChild(tr);
+    //     });
+    // }
+
+    // 渲染分页控件
+    function renderPagination() {
+        const paginationEl = document.getElementById('pagination');
+        paginationEl.innerHTML = '';
+
+        if (totalItems === 0) return;
+
+        const totalPages = Math.ceil(totalItems / pageSize);
+
+        // 上一页
+        const prevLi = document.createElement('li');
+        prevLi.className = currentPage === 1 ? 'disabled' : '';
+        prevLi.innerHTML = `<a href="#">上一页</a>`;
+        if (currentPage > 1) {
+            prevLi.querySelector('a').addEventListener('click', e => {
+                e.preventDefault();
+                currentPage--;
+                loadOrders();
+            });
+        }
+        paginationEl.appendChild(prevLi);
+
+        // 页码
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+
+        for (let i = startPage; i <= endPage; i++) {
+            const li = document.createElement('li');
+            li.className = i === currentPage ? 'active' : '';
+            li.innerHTML = `<a href="#">${i}</a>`;
+            li.querySelector('a').addEventListener('click', e => {
+                e.preventDefault();
+                currentPage = i;
+                loadOrders();
+            });
+            paginationEl.appendChild(li);
+        }
+
+        // 下一页
+        const nextLi = document.createElement('li');
+        nextLi.className = currentPage === totalPages ? 'disabled' : '';
+        nextLi.innerHTML = `<a href="#">下一页</a>`;
+        if (currentPage < totalPages) {
+            nextLi.querySelector('a').addEventListener('click', e => {
+                e.preventDefault();
+                currentPage++;
+                loadOrders();
+            });
+        }
+        paginationEl.appendChild(nextLi);
+    }
+
+    // 查看订单详情
+    function viewOrderDetails(orderId) {
+        window.location.href = `http://localhost:8888/Sale/cus_edit.html?id=${orderId}&mode=view`;
+    }
+
+    // 编辑订单
+    function editOrder(orderId) {
+        window.location.href = `http://localhost:8888/Sale/cus_edit.html?id=${orderId}`;
+    }
+
+    // 删除订单
+    function deleteOrder(orderId) {
+        if (confirm('确定要删除此订单吗？此操作不可撤销。')) {
+            // 创建表单数据
+            const formData = new FormData();
+            formData.append('id', orderId);
+
+            // 发送删除请求
+            fetch(`${httphost}/sale/del`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.success) {
+                        showToast('订单删除成功', 'success');
+                        loadOrders(); // 重新加载订单列表
+                    } else {
+                        showToast(data.msg || '删除订单失败', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('删除订单失败:', error);
+                    showToast('删除订单失败，请稍后重试', 'danger');
+                });
+        }
+    }
+
+    // 显示消息提示
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.classList.add('toast', `toast-${type}`);
+        toast.textContent = message;
+
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+
+        // 触发重绘以应用动画
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        // 3秒后移除
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => {
+                container.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // 检查订单状态
+    // async function checkOrderStatus(orderId) {
+    //     try {
+    //         const response = await fetch(`${httphost}/sale/getSaleDetails/${orderId}`);
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
+    //
+    //         const result = await response.json();
+    //         if (!result || !result.rows) {
+    //             return true; // 没有明细数据，默认为已完成
+    //         }
+    //
+    //         // 创建一个Map来存储每个purchase_plan_pid的所有明细条目
+    //         let planDetailsMap = new Map();
+    //
+    //         // 遍历所有明细记录，按purchase_plan_pid分组
+    //         for (let i = 0; i < result.rows.length; i++) {
+    //             let detail = result.rows[i];
+    //             let planId = detail.salePid;
+    //
+    //             if (!planId) continue;
+    //
+    //             // 如果是第一次看到这个planId，初始化一个数组
+    //             if (!planDetailsMap.has(planId)) {
+    //                 planDetailsMap.set(planId, []);
+    //             }
+    //
+    //             // 将这条明细记录添加到对应的planId数组中
+    //             // 将这条明细记录添加到对应的planId数组中
+    //             planDetailsMap.get(planId).push(detail);
+    //         }
+    //
+    //         // 检查每个采购计划单的明细是否都已完成
+    //         let allCompleted = true;
+    //
+    //         // 遍历Map中的每个计划单
+    //         for (let [planId, details] of planDetailsMap) {
+    //             // 检查这个计划单的所有明细是否都已完成(isClose=1)
+    //             let planCompleted = details.every(detail => detail.isClose === 1);
+    //
+    //             // 如果任何一个计划单没有完成，整体就是未完成
+    //             if (!planCompleted) {
+    //                 allCompleted = false;
+    //                 break;
+    //             }
+    //         }
+    //
+    //         return allCompleted;
+    //     } catch (error) {
+    //         console.error('获取订单详情失败:', error);
+    //         return false; // 发生错误时，默认为未完成
+    //     }
+    // }
+
+    function checkOrderStatus(orderId) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: "GET",
+                url: httphost + '/sale/getSaleDetails/' + orderId,
+                dataType: 'json',
+                success: function(result) {
+                    if (!result || !result.rows) {
+                        // 没有明细数据，默认为未完成
+                        resolve(false);
+                        return;
+                    }
+                    // 创建一个Map来存储每个purchase_plan_pid的所有明细条目
+                    let planDetailsMap = new Map();
+                    // 遍历所有明细记录，按purchase_plan_pid分组
+                    for (let i = 0; i < result.rows.length; i++) {
+                        let detail = result.rows[i];
+                        let planId = detail.salePid;
+                        if (!planId) continue;
+                        // 如果是第一次看到这个planId，初始化一个数组
+                        if (!planDetailsMap.has(planId)) {
+                            planDetailsMap.set(planId, []);
+                        }
+                        // 将这条明细记录添加到对应的planId数组中
+                        planDetailsMap.get(planId).push(detail);
+                    }
+                    // 检查每个采购计划单的明细是否都已完成
+                    let allCompleted = true;
+                    // 遍历Map中的每个计划单
+                    for (let [planId, details] of planDetailsMap.entries()) {
+                        // 检查这个计划单的所有明细是否都已完成(isClose=1)
+                        let planCompleted = details.every(detail => detail.isClose === 1);
+                        // 如果任何一个计划单没有完成，整体就是未完成
+                        if (!planCompleted) {
+                            allCompleted = false;
+                            break;
+                        }
+                    }
+                    resolve(allCompleted);
+                },
+                error: function(xhr, status, error) {
+                    console.error('获取订单详情失败:', error);
+                    // 发生错误时，默认为未完成
+                    resolve(false);
+                }
+            });
+        });
+    }
+    // 修改渲染订单表格函数，确保正确处理状态显示
+    async function renderOrderTable() {
+        const tableBody = document.getElementById('order-table-body');
+        tableBody.innerHTML = '';
+        if (orders.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">暂无订单数据</td></tr>';
+            return;
+        }
+        // 检查每个订单的状态
+        for (let i = 0; i < orders.length; i++) {
+            const order = orders[i];
+            // 如果订单状态尚未确定，检查它的状态
+            if (order.status !== 'completed' && order.status !== 'processing') {
+                const isCompleted = await checkOrderStatus(order.id);
+                orders[i].status = isCompleted ? 'completed' : 'processing';
+            }
+        }
+        // 渲染订单表格
+        orders.forEach(order => {
+            const tr = document.createElement('tr');
+            // 订单状态样式
+            const statusClass = order.status === 'completed' ? 'status-completed' : 'status-processing';
+            const statusText = order.status === 'completed' ? '已完成' : '进行中';
+            tr.innerHTML = `
+        <td>${order.sno || '-'}</td>
+        <td>${order.createTime || '-'}</td>
+        <td>${order.dueDate || '-'}</td>
+        <td>${order.guName || '-'}</td>
+        <td>${order.updateTime || '-'}</td>
+        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        <td>
+          <div class="btn-group">
+            <span class="action-icon icon-view" title="查看详情" onclick="viewOrderDetails('${order.id}')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </span>
+            <span class="action-icon icon-edit" title="编辑订单" onclick="editOrder('${order.id}')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </span>
+            <span class="action-icon icon-delete" title="删除订单" onclick="deleteOrder('${order.id}')">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </span>
+          </div>
+        </td>
+      `;
+            tableBody.appendChild(tr);
+        });
+    }
+    // 在渲染表格完成后更新批量检查订单状态
+    // function updateAllOrderStatus() {
+    //     const promises = orders.map(async (order, index) => {
+    //         const isCompleted = await checkOrderStatus(order.id);
+    //         // 更新内存中的订单状态
+    //         orders[index].status = isCompleted ? 'completed' : 'processing';
+    //     });
+    //     // 等待所有状态检查完成
+    //     Promise.all(promises).then(() => {
+    //         // 重新渲染表格以显示更新后的状态
+    //         renderOrderTable();
+    //     }).catch(error => {
+    //         console.error('更新订单状态时出错:', error);
+    //     });
+    // }
+
+    // 批量检查所有订单状态并更新UI
+    async function updateAllOrderStatus() {
+        for (let i = 0; i < orders.length; i++) {
+            const order = orders[i];
+            const isCompleted = await checkOrderStatus(order.id);
+
+            // 更新内存中的订单状态
+            orders[i].status = isCompleted ? 'completed' : 'processing';
+        }
+
+        // 重新渲染表格以显示更新后的状态
+        renderOrderTable();
+    }
+
+    // 格式化日期
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString; // 如果无效则返回原始字符串
+
+        return date.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // 设置当前日期范围默认值
+    function setDefaultDateRange() {
+        // 设置结束日期为今天
+        const today = new Date();
+        const endDateStr = today.toISOString().split('T')[0];
+        document.getElementById('end-date').value = endDateStr;
+
+        // 设置开始日期为三个月前
+        const threeMonthsAgo = new Date(today);
+        threeMonthsAgo.setMonth(today.getMonth() - 3);
+        const startDateStr = threeMonthsAgo.toISOString().split('T')[0];
+        document.getElementById('start-date').value = startDateStr;
+    }
+
+    // 获取URL参数
+    function getUrlParams() {
+        const queryString = window.location.search;
+        if (!queryString) return {};
+
+        const params = {};
+        const pairs = queryString.substring(1).split('&');
+
+        for (let i = 0; i < pairs.length; i++) {
+            const pair = pairs[i].split('=');
+            params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
+        }
+
+        return params;
+    }
+
+    // 初始化页面后额外运行的代码
+    setTimeout(() => {
+        // 设置默认日期范围
+        setDefaultDateRange();
+
+        // 处理URL参数中的状态过滤
+        const params = getUrlParams();
+        // if (params.status) {
+        //     document.getElementById('order-status').value = params.status;
+        //     loadOrders();
+        // }
+
+        // 添加对回车键的支持
+        document.getElementById('order-no').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('search-btn').click();
+            }
+        });
+    }, 100);
+</script>
+</body>
+</html>

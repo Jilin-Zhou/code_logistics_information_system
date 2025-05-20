@@ -77,26 +77,29 @@
                     width : 140,
                     align: "center",
                     sortable : true,
-                }, {
-                    field : 'supplier',
-                    title : '收件人',
-                    width : 140,
-                    align: "center",
-                    sortable : true,
-                },{
+                },
+                //     {
+                //     field : 'supplier',
+                //     title : '收件人',
+                //     width : 140,
+                //     align: "center",
+                //     sortable : true,
+                // },
+                    {
                     field : 'phone',
                     title : '联系电话',
                     width : 140,
                     align: "center",
                     sortable : true,
                 },
+                    // {
+                    //     field : 'yuanName',
+                    //     title : '发件人',
+                    //     width : 100,
+                    //     align: "center",
+                    //     sortable : true,
+                    // },
                     {
-                        field : 'yuanName',
-                        title : '发件人',
-                        width : 100,
-                        align: "center",
-                        sortable : true,
-                    },{
                         field : 'createTime',
                         title : '制单日期',
                         align : 'center',
@@ -295,7 +298,7 @@
             <table>
                 <tr>
                     <td>运输单号：</td><td><input id="sno" name="sno" ></td>
-                    <td>收件人：</td><td><input id="supplier" name="supplier" ></td>
+<!--                    <td>收件人：</td><td><input id="supplier" name="supplier" ></td>-->
                     <td>发货仓库地址：</td><td><input id="cangPid" name="cangPid" ></td>
                     <td><a href="javascript:void(0)" class="easyui-linkbutton"
                            plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;

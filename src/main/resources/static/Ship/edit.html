@@ -161,7 +161,7 @@
                 },
                 {
                   field : 'num',
-                  title : '本次出库数量',
+                  title : '本次运输数量',
                   align : 'center',
                   width : 80,
                   editor : {
@@ -317,12 +317,12 @@
           $('#cangPid').combogrid('setValue', result.cangPid);
           $('#yuanPid').combogrid('setValue', result.yuanPid);
           $('#dueDate').datebox('setValue',result.dueDate);
-          $('#w').window({title:"出库单： -- &nbsp;&nbsp; 修改"}) ;
+          $('#w').window({title:"运输单： -- &nbsp;&nbsp; 修改"}) ;
         }
       });
 
     }else{	// 新增界面
-      $('#w').window({title:"出库单： -- &nbsp;&nbsp; 新增"}) ;
+      $('#w').window({title:"运输单： -- &nbsp;&nbsp; 新增"}) ;
     }
   }
 
@@ -462,10 +462,10 @@
       <form id="fm_out">
         <table style="padding:10px 0 0 0;">
           <tr><td>出库单号：</td><td><input id="sno" name="sno" readonly></td>
-            <td>收件人：</td><td><input id="supplier" name="supplier" ></td>
+<!--            <td>收件人：</td><td><input id="supplier" name="supplier" ></td>-->
             <td>送货地址：</td><td><input id="cangPid" name="cangPid" ></td>
           </tr>
-          <tr> <td>发件人</td><td><input id="yuanPid" name="yuanPid" ></td>
+<!--          <tr> <td>发件人</td><td><input id="yuanPid" name="yuanPid" ></td>-->
             <td>预计送达日期：</td><td><input id="dueDate" name="dueDate" class="easyui-datebox" ></td>
           </tr>
         </table>

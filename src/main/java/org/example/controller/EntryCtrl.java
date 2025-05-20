@@ -57,11 +57,25 @@ public class EntryCtrl {
 
 
     @RequestMapping("/getData")
-    public Page<Entry> getData(Pageable page, Entry entry, String start, String end){
+    public Page<Entry> getData(Pageable page, Entry entry, String start, String end, Integer cangPid, Integer yuanPid){
         page.setOrderProperty("updateTime");
         page.setOrderDirection(Order.Direction.desc);
 
         List<Filter> filters = new ArrayList<>();
+        if (cangPid!=null){
+            Filter ft = new Filter();
+            ft.setProperty("cang");
+            ft.setValue(cangPid);
+            ft.setOperator(Filter.Operator.eq);
+            filters.add(ft);
+        }
+        if (yuanPid!=null){
+            Filter ft = new Filter();
+            ft.setProperty("yuan");
+            ft.setValue(yuanPid);
+            ft.setOperator(Filter.Operator.eq);
+            filters.add(ft);
+        }
 
         addStartAndEndRestrict(start, end, filters);
         page.setFilters(filters);

@@ -4,13 +4,17 @@ import org.example.pageModel.Json;
 import org.example.pageModel.Page;
 import org.example.pageModel.Pageable;
 import org.example.pojo.Gu;
+import org.example.pojo.Login;
 import org.example.service.GuService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-
+import javax.management.Query;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 
 @RestController
@@ -39,6 +43,37 @@ public class GuCtrl {
             e.printStackTrace();
             json.setSuccess(true);
             json.setMsg("修改失败");
+        }
+        return json;
+    }
+
+    // 新增接口：通过顾客名称查询顾客ID
+    @RequestMapping("getGuPidByName")
+    public Json getGuPidByName(String guName) {
+        Json json = new Json();
+        try {
+            // 创建一个Gu对象作为查询条件
+            Gu condition = new Gu();
+            condition.setSname(guName);
+
+            // 使用现有服务查询符合条件的顾客
+            Page<Gu> result = guService.findPage(new Pageable(), condition);
+
+            if (result != null && result.getRows() != null && !result.getRows().isEmpty()) {
+                // 找到匹配的顾客，返回第一个匹配项的ID
+                Gu matchedGu = result.getRows().get(0);
+                json.setObj(matchedGu.getId());
+                json.setSuccess(true);
+                json.setMsg("查询成功");
+            } else {
+                // 未找到匹配的顾客
+                json.setSuccess(false);
+                json.setMsg("未找到该顾客");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            json.setSuccess(false);
+            json.setMsg("查询失败: " + e.getMessage());
         }
         return json;
     }
@@ -72,4 +107,6 @@ public class GuCtrl {
         }
         return json;
     }
+
+
 }

@@ -25,6 +25,61 @@
     openSocket();
 
     $(function() {
+        $('#cangPid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/cang/getCang',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#cangPid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#cangPid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'sno',title:'编号',width : 60},
+                {field:'sname',title:'名称',align:'center'},
+                {field:'addition',title:'描述',width : 160},
+            ]],
+        });
+        $('#yuanPid').combogrid({
+            panelWidth:380,
+            panelHeight:450,
+            idField : 'id',
+            textField : 'sname',
+            pagination : true,
+            fitColumns : true,
+            fit : true,
+            rownumbers : true,// 显示行号
+            singleSelect : true,// 只能单选
+            border : false,
+            striped : true,// 隔行变色
+            url: httphost + '/yuan/getYuan',
+            pageList : [15,30,50],
+            delay: 200,
+            keyHandler:  {      // 控件按键向后台请求数据
+                query: function (q) {
+                    $('#yuanPid').combogrid('grid').datagrid('load', {sname: q});
+                    $('#yuanPid').combogrid('setValue',q);
+                }
+            },
+            columns:[[
+                {field:'sno',title:'编号',width : 60},
+                {field:'sname',title:'名称',align:'center'},
+                {field:'addition',title:'联系方式',width : 160},
+                {field:'department',title:'部门',width : 160},
+            ]],
+        });
         editrow = 'undefined'; //行编辑开关
         dataGrid = $('#dataGrid')
             .datagrid({
@@ -77,12 +132,13 @@
                         align : "center",
                     },
 
-                    {	field : 'addition',
-                        title : '备注',
-                        width : 180,
-                        sortable : true,
-                        align : "center",
-                    },{	field : 'updateTime',
+                    // {	field : 'addition',
+                    //     title : '备注',
+                    //     width : 180,
+                    //     sortable : true,
+                    //     align : "center",
+                    // },
+                    {	field : 'updateTime',
                         title : '修改日期',
                         width : 80,
                         sortable : true,
@@ -148,8 +204,9 @@
         //console.info($('#station').combobox('getValue'));
         $('#dataGrid').datagrid('load', {
             // 参数名与后台pojo属性名一致即可自动填充
-            // 'canID' : $('#canID').combobox('getValue'),
             'sno' : $('#sno').val(),
+            'cangPid' : $('#cangPid').combogrid('getValue'),
+            'yuanPid' : $('#yuanPid').combogrid('getValue'),
             // 支持级联属性填充
             'start' :  $('#start').datetimebox('getValue'),
             'end' :  $('#end').datetimebox('getValue')
@@ -160,15 +217,17 @@
 
     function clearSearch() {
         $('#dataGrid').datagrid('load', {});
+        $('#cangPid').combogrid('setValue','');
+        $('#yuanPid').combogrid('setValue','');
         $('#canID').combobox('setValue','');
         $('#start').datetimebox('setValue','');
         $('#end').datetimebox('setValue','');
+        $('#sno').val('');
     }
 
     function exportExcel(){
 
         openBlank('exportExcel', {
-            'canID' : $('#canID').combobox('getValue'),
             'start' :  $('#start').datetimebox('getValue'),
             'end' :  $('#end').datetimebox('getValue')
         }) ;
@@ -332,6 +391,7 @@
     <a	onclick="dataGrid.datagrid('reload');" href="javascript:void(0);"
           class="easyui-linkbutton"
           data-options="plain:true,iconCls:'transmit'">刷新</a>&nbsp;&nbsp;
+
 <!--    <a	onclick="exportExcel();" href="javascript:void(0);"-->
 <!--          class="easyui-linkbutton"-->
 <!--          data-options="plain:true,iconCls:'export_excel'">导出Excel</a>-->
@@ -344,6 +404,8 @@
             <table>
                 <tr>
                     <td>计划单号：</td><td><input id="sno" name="sno" ></td>
+                    <td>仓库：</td><td><input id="cangPid" name="cangPid" ></td>
+                    <td>制单人：</td><td><input id="yuanPid" name="yuanPid" ></td>
                     <td><a href="javascript:void(0)" class="easyui-linkbutton"
                            plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;
                         <a href="javascript:void(0)" class="easyui-linkbutton"

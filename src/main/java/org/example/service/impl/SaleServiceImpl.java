@@ -84,6 +84,7 @@ public class SaleServiceImpl extends BaseServiceImpl<Sale, Integer> implements S
                 Goods goods = goodsDao.find(d.getGoodsPid());
                 saleDetail.setGoods(goods);
                 saleDetail.setSale(sale);
+                saleDetail.setAlreadyNum(0);
                 BeanUtils.copyProperties(d, saleDetail, "salePid", "goodsPid");
                 saleDetailSet.add(saleDetail);
             }

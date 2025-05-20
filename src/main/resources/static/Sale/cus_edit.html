@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>销售订单修改</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #eaefff;
+      --danger: #ef476f;
+      --success: #06d6a0;
+      --dark: #2b2d42;
+      --text: #4f5366;
+      --light-text: #8d99ae;
+      --border: #e9ecef;
+      --bg-light: #f8f9fa;
+      --white: #ffffff;
+      --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      --radius: 6px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--dark);
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* 通用样式 */
+    h1, h2, h3 {
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .text-muted {
+      color: var(--light-text);
+      font-size: 0.875rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35em 0.65em;
+      font-size: 0.75em;
+      font-weight: 500;
+      line-height: 1;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: baseline;
+      border-radius: 50rem;
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    /* 布局组件 */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* 表单组件 */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -0.75rem;
+    }
+
+    .form-col {
+      flex: 1;
+      min-width: 250px;
+      padding: 0 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .form-control {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--dark);
+      background-color: var(--white);
+      background-clip: padding-box;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.15s ease-in-out;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+
+    .form-control[readonly] {
+      background-color: var(--bg-light);
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    /* 自定义select样式 */
+    .custom-select {
+      position: relative;
+      display: block;
+      width: 100%;
+    }
+
+    .custom-select select {
+      display: block;
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--dark);
+      background-color: var(--white);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%234f5366' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 16px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      appearance: none;
+      transition: border-color 0.15s ease-in-out;
+    }
+
+    .custom-select select:focus {
+      border-color: var(--primary);
+      outline: 0;
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+    }
+
+    /* 表格组件 */
+    .table-wrapper {
+      overflow-x: auto;
+      margin-bottom: 1rem;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .table th,
+    .table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table th {
+      font-weight: 500;
+      color: var(--text);
+      background-color: var(--bg-light);
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: var(--bg-light);
+    }
+
+    .table-row-selected {
+      background-color: var(--primary-light) !important;
+    }
+
+    /* 按钮样式 */
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      line-height: 1.5;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      user-select: none;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      transition: all 0.2s ease-in-out;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      color: var(--white);
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .btn-primary:hover {
+      background-color: #344bd1;
+      border-color: #344bd1;
+    }
+
+    .btn-outline {
+      color: var(--primary);
+      background-color: transparent;
+      border-color: var(--primary);
+    }
+
+    .btn-outline:hover {
+      color: var(--white);
+      background-color: var(--primary);
+    }
+
+    .btn-danger {
+      color: var(--white);
+      background-color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background-color: #d63e60;
+      border-color: #d63e60;
+    }
+
+    .btn-success {
+      color: var(--white);
+      background-color: var(--success);
+      border-color: var(--success);
+    }
+
+    .btn-success:hover {
+      background-color: #05b389;
+      border-color: #05b389;
+    }
+
+    /* 固定底部栏 */
+    .footer-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      justify-content: flex-end;
+      padding: 1rem 2rem;
+      background-color: var(--white);
+      box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    /* 提示框 */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1050;
+    }
+
+    .toast {
+      max-width: 350px;
+      padding: 0.75rem 1.25rem;
+      margin-bottom: 1rem;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+      background-color: var(--white);
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .toast-success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast-danger {
+      border-left: 4px solid var(--danger);
+    }
+
+    /* Checkbox样式 */
+    .checkbox-wrapper {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+
+    .checkbox {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+
+    .checkmark {
+      position: relative;
+      height: 18px;
+      width: 18px;
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+    }
+
+    .checkbox:checked ~ .checkmark {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+
+    .checkbox:checked ~ .checkmark:after {
+      display: block;
+    }
+
+    .checkbox-wrapper .checkmark:after {
+      left: 6px;
+      top: 2px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    /* 模态弹窗 */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1040;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%;
+      max-width: 500px;
+      background-color: var(--white);
+      border-radius: var(--radius);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      z-index: 1050;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--light-text);
+      transition: color 0.2s;
+    }
+
+    .close-btn:hover {
+      color: var(--dark);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+
+    /* 自动补全下拉框 */
+    .autocomplete-container {
+      position: relative;
+    }
+
+    .autocomplete-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 0 0 var(--radius) var(--radius);
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .autocomplete-results.show {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.active {
+      background-color: var(--primary-light);
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .form-col {
+        min-width: 100%;
+      }
+
+      .footer-bar {
+        padding: 0.75rem 1rem;
+      }
+
+      .btn {
+        padding: 0.4rem 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1 id="page-title">销售订单修改</h1>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>基本信息</h2>
+      <span class="badge" id="order-status">编辑中</span>
+    </div>
+
+    <form id="orderForm">
+      <div class="form-group">
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label" for="sno">销售订单号</label>
+            <input type="text" id="sno" class="form-control" readonly>
+          </div>
+          <div class="form-col">
+            <label class="form-label" for="cangPid">发货仓库</label>
+            <input type="text" id="cangPid" class="form-control" readonly>
+            <input type="hidden" id="cangPid-id">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label" for="yuanPid">业务员</label>
+            <input type="text" id="yuanPid" class="form-control" readonly>
+            <input type="hidden" id="yuanPid-id">
+          </div>
+          <div class="form-col">
+            <div class="form-col">
+            <label class="form-label" for="guPid">顾客</label>
+              <input type="text" id="guPid" class="form-control" readonly>
+              <input type="hidden" id="guPid-id">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-row">
+          <div class="form-col">
+            <label class="form-label" for="dueDate">销售日期</label>
+            <input type="date" id="dueDate" class="form-control">
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h2>订单明细</h2>
+      <div class="btn-group">
+        <button id="addRowBtn" class="btn btn-primary">新增一行</button>
+        <button id="deleteSelectedBtn" class="btn btn-danger">删除选中</button>
+        <button id="refreshBtn" class="btn btn-outline">刷新</button>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table id="orderDetailsTable" class="table table-hover">
+        <thead>
+        <tr>
+          <th style="width: 50px;">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="select-all" class="checkbox">
+              <span class="checkmark"></span>
+            </div>
+          </th>
+          <th>图书名称</th>
+          <th>图书类别</th>
+          <th>购买数量</th>
+          <th>购买价格</th>
+          <th>已出库数量</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody id="orderDetailsBody">
+        <!-- 数据将通过JavaScript动态添加 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="footer-bar">
+  <div class="btn-group">
+    <button id="cancelBtn" class="btn btn-outline">取消</button>
+    <button id="submitBtn" class="btn btn-success">确认更新</button>
+  </div>
+</div>
+
+<!-- 图书选择模态框 -->
+<div class="modal-backdrop" id="goodsModalBackdrop"></div>
+<div class="modal" id="goodsModal">
+  <div class="modal-header">
+    <h3 class="modal-title">选择图书</h3>
+    <button type="button" class="close-btn" id="closeGoodsModal">&times;</button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group">
+      <input type="text" id="goodsSearch" class="form-control" placeholder="搜索图书...">
+    </div>
+    <div class="table-wrapper">
+      <table class="table table-hover">
+        <thead>
+        <tr>
+          <th>图书编号</th>
+          <th>图书名称</th>
+          <th>图书类别</th>
+          <th>参考价格</th>
+        </tr>
+        </thead>
+        <tbody id="goodsTableBody">
+        <!-- 图书数据将通过JavaScript动态添加 -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" id="cancelGoodsModal">取消</button>
+    <button type="button" class="btn btn-primary" id="selectGoodsBtn">选择</button>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container">
+  <!-- 通知消息将通过JavaScript动态添加 -->
+</div>
+
+<script>
+  // 全局变量
+  let url = location.search;
+  let Request = new Object();
+  let id; // 订单ID
+  let editingRowIndex = -1; // 当前编辑行索引
+  let isViewMode = false; // 是否为查看模式
+  let httphost = ''; // API路径前缀
+
+  // 存储数据
+  let orderDetails = []; // 订单明细数据
+  let insertedRows = []; // 新增的行
+  let updatedRows = []; // 更新的行
+  let deletedRows = []; // 删除的行
+
+  // 临时数据
+  let tempSelectedGoods = null; // 临时选中的图书
+
+  // 初始化页面
+  document.addEventListener('DOMContentLoaded', function() {
+    // 解析URL参数
+    if (url.indexOf("?") != -1) {
+      let str = url.substr(1); // 去掉?号
+      strs = str.split("&");
+      for (let i = 0; i < strs.length; i++) {
+        Request[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+      }
+      id = Request["id"];
+
+      // 检查是否为查看模式
+      if (Request["mode"] === "view") {
+        isViewMode = true;
+        document.getElementById('page-title').textContent = "销售订单查看";
+        document.getElementById('order-status').textContent = "查看中";
+
+        // 禁用所有输入和按钮
+        disableFormInputs();
+      }
+    }
+
+    // 加载订单数据
+    if (id) {
+      loadOrderData();
+      loadOrderDetails();
+    } else {
+      // 新订单
+      document.getElementById('page-title').textContent = "销售订单新增";
+      document.getElementById('order-status').textContent = "新增中";
+    }
+
+    // 设置事件监听器
+    setupEventListeners();
+  });
+
+  // 设置事件监听器
+  function setupEventListeners() {
+    // 全选/取消全选
+    document.getElementById('select-all').addEventListener('change', function() {
+      const isChecked = this.checked;
+      document.querySelectorAll('.item-checkbox').forEach(cb => {
+        cb.checked = isChecked;
+        const row = cb.closest('tr');
+        if (isChecked) {
+          row.classList.add('table-row-selected');
+        } else {
+          row.classList.remove('table-row-selected');
+        }
+      });
+
+
+    });
+
+    // 新增行按钮
+    document.getElementById('addRowBtn').addEventListener('click', function() {
+      if (isViewMode) return; // 查看模式下不允许操作
+
+      // 打开图书选择模态框
+      openGoodsModal();
+    });
+
+    // 删除选中按钮
+    document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
+      if (isViewMode) return; // 查看模式下不允许操作
+      deleteSelectedRows();
+    });
+
+    // 刷新按钮
+    document.getElementById('refreshBtn').addEventListener('click', function() {
+      loadOrderDetails();
+    });
+
+    // 取消按钮
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+      if (confirm('确定要取消当前操作吗？未保存的数据将丢失。')) {
+        window.close();
+      }
+    });
+
+    // 确认更新按钮
+    document.getElementById('submitBtn').addEventListener('click', function() {
+      if (isViewMode) {
+        window.close(); // 查看模式下直接关闭
+      } else {
+        submitOrder();
+      }
+    });
+
+    // 图书搜索输入框
+    document.getElementById('goodsSearch').addEventListener('input', function() {
+      searchGoods(this.value);
+    });
+
+    // 关闭图书模态框按钮
+    document.getElementById('closeGoodsModal').addEventListener('click', closeGoodsModal);
+    document.getElementById('cancelGoodsModal').addEventListener('click', closeGoodsModal);
+
+    // 选择图书按钮
+    document.getElementById('selectGoodsBtn').addEventListener('click', function() {
+      if (tempSelectedGoods) {
+        addNewRow(tempSelectedGoods);
+        closeGoodsModal();
+        tempSelectedGoods = null;
+      } else {
+        showToast('请选择一个图书', 'danger');
+      }
+    });
+
+    // 自动补全输入框设置 - 移除仓库和员工的自动完成
+    // setupAutocomplete('cangPid', 'cangPid-results', '/cang/getCang', renderCangItem); // 移除
+    // setupAutocomplete('yuanPid', 'yuanPid-results', '/yuan/getYuan', renderYuanItem); // 移除
+    setupAutocomplete('guPid', 'guPid-results', '/gu/getGu', renderGuItem); // 保留顾客选择
+  }
+
+  // 设置自动补全功能
+  function setupAutocomplete(inputId, resultsId, apiUrl, renderItemFunc) {
+    const input = document.getElementById(inputId);
+    const results = document.getElementById(resultsId);
+    const hiddenInput = document.getElementById(`${inputId}-id`);
+
+    let debounceTimer;
+
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+
+      if (this.value.length < 1) {
+        results.innerHTML = '';
+        results.classList.remove('show');
+        return;
+      }
+
+      debounceTimer = setTimeout(() => {
+        fetchAutocompleteData(apiUrl, this.value, results, renderItemFunc, (item) => {
+          input.value = item.sname;
+          hiddenInput.value = item.id;
+          results.classList.remove('show');
+        });
+      }, 300);
+    });
+
+    // 点击外部关闭下拉框
+    document.addEventListener('click', function(e) {
+      if (!input.contains(e.target) && !results.contains(e.target)) {
+        results.classList.remove('show');
+      }
+    });
+
+    // 获得焦点时显示
+    input.addEventListener('focus', function() {
+      if (this.value.length > 0) {
+        results.classList.add('show');
+      }
+    });
+  }
+
+  // 获取自动补全数据
+  function fetchAutocompleteData(apiUrl, query, resultsElement, renderItemFunc, selectCallback) {
+    fetch(`${httphost}${apiUrl}?sname=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+              resultsElement.innerHTML = '';
+
+              const items = data.rows || data;
+
+              if (items.length === 0) {
+                resultsElement.innerHTML = '<div class="autocomplete-item">无匹配结果</div>';
+                resultsElement.classList.add('show');
+                return;
+              }
+
+              items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.innerHTML = renderItemFunc(item);
+
+                div.addEventListener('click', () => {
+                  selectCallback(item);
+                });
+
+                resultsElement.appendChild(div);
+              });
+
+              resultsElement.classList.add('show');
+            })
+            .catch(error => {
+              console.error('获取自动补全数据失败:', error);
+              resultsElement.innerHTML = '<div class="autocomplete-item">加载失败</div>';
+              resultsElement.classList.add('show');
+            });
+  }
+
+  // 渲染仓库项
+  function renderCangItem(item) {
+    return `${item.sname} <span class="text-muted">${item.department || ''}</span>`;
+  }
+
+  // 渲染员工项
+  function renderYuanItem(item) {
+    return `${item.sname}`;
+  }
+
+  // 渲染顾客项
+  function renderGuItem(item) {
+    return `${item.sname} <span class="text-muted">${item.addition || ''}</span>`;
+  }
+
+  // 加载订单基本信息
+  function loadOrderData() {
+    fetch(`${httphost}/sale/getSingleSale`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `id=${id}`
+    })
+            .then(response => response.json())
+            .then(data => {
+              document.getElementById('sno').value = data.sno || '';
+
+              // 设置仓库
+              if (data.cangPid) {
+                fetch(`${httphost}/cang/getCang?id=${data.cangPid}`)
+                        .then(response => response.json())
+                        .then(cangData => {
+                          const cang = cangData.rows?.[0] || cangData;
+                          document.getElementById('cangPid').value = cang.sname || '';
+                          document.getElementById('cangPid-id').value = data.cangPid;
+                        });
+              }
+
+              // 设置员工
+              if (data.yuanPid) {
+                fetch(`${httphost}/yuan/getYuan?id=${data.yuanPid}`)
+                        .then(response => response.json())
+                        .then(yuanData => {
+                          const yuan = yuanData.rows?.[0] || yuanData;
+                          document.getElementById('yuanPid').value = yuan.sname || '';
+                          document.getElementById('yuanPid-id').value = data.yuanPid;
+                        });
+              }
+
+              // 设置顾客
+              if (data.guPid) {
+                fetch(`${httphost}/gu/getGu?id=${data.guPid}`)
+                        .then(response => response.json())
+                        .then(guData => {
+                          const gu = guData.rows?.[0] || guData;
+                          document.getElementById('guPid').value = gu.sname || '';
+                          document.getElementById('guPid-id').value = data.guPid;
+                        });
+              }
+
+              // 设置日期
+              if (data.dueDate) {
+                // 将日期格式转换为HTML日期输入框所需的格式 (YYYY-MM-DD)
+                const dateObj = new Date(data.dueDate);
+                const formattedDate = dateObj.toISOString().split('T')[0];
+                document.getElementById('dueDate').value = formattedDate;
+              }
+            })
+            .catch(error => {
+              console.error('获取订单数据失败:', error);
+              showToast('获取订单信息失败，请重试', 'danger');
+            });
+  }
+
+  // 加载订单明细
+  function loadOrderDetails() {
+    if (!id) return;
+
+    showLoadingIndicator();
+
+    fetch(`${httphost}/sale/getSaleDetails/${id}`)
+            .then(response => response.json())
+            .then(data => {
+              hideLoadingIndicator();
+
+              // 清空当前表格数据
+              orderDetails = data.rows || data;
+              renderOrderDetails();
+            })
+            .catch(error => {
+              hideLoadingIndicator();
+              console.error('获取订单明细失败:', error);
+              showToast('获取订单明细失败，请重试', 'danger');
+            });
+  }
+
+  // 渲染订单明细表格
+  function renderOrderDetails() {
+    const tbody = document.getElementById('orderDetailsBody');
+    tbody.innerHTML = '';
+
+    if (!orderDetails || orderDetails.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="text-muted" style="text-align: center;">暂无订单明细数据</td></tr>`;
+      return;
+    }
+
+    orderDetails.forEach((detail, index) => {
+      const row = document.createElement('tr');
+      row.setAttribute('data-id', detail.id);
+      row.setAttribute('data-index', index);
+
+      // 选择框
+      const selectCell = document.createElement('td');
+      selectCell.innerHTML = `
+        <div class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox item-checkbox" id="select-${detail.id}">
+          <span class="checkmark"></span>
+        </div>
+      `;
+
+      // 图书名称
+      const nameCell = document.createElement('td');
+      nameCell.textContent = detail.goodsName || '';
+
+      // 图书类别
+      const typeCell = document.createElement('td');
+      typeCell.textContent = detail.goodsTypeName || '';
+
+      // 销售数量
+      const numCell = document.createElement('td');
+      numCell.textContent = detail.num || '0';
+
+      // 销售价格
+      const priceCell = document.createElement('td');
+      priceCell.textContent = detail.price || '0.00';
+
+      // 已销售数量
+      const alreadyNumCell = document.createElement('td');
+      alreadyNumCell.textContent = detail.alreadyNum || '0';
+
+      // 操作按钮
+      const actionCell = document.createElement('td');
+      if (!isViewMode) {
+        actionCell.innerHTML = `
+          <div class="btn-group">
+            <button class="btn btn-outline edit-btn" data-id="${detail.id}">编辑</button>
+          </div>
+        `;
+      }
+
+      row.appendChild(selectCell);
+      row.appendChild(nameCell);
+      row.appendChild(typeCell);
+      row.appendChild(numCell);
+      row.appendChild(priceCell);
+      row.appendChild(alreadyNumCell);
+      row.appendChild(actionCell);
+
+      tbody.appendChild(row);
+    });
+
+    // 添加行选择事件
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const row = this.closest('tr');
+        if (this.checked) {
+          row.classList.add('table-row-selected');
+        } else {
+          row.classList.remove('table-row-selected');
+          document.getElementById('select-all').checked = false;
+        }
+      });
+    });
+
+    // 添加编辑按钮事件
+    document.querySelectorAll('.edit-btn').forEach(button => {
+      button.addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        const row = this.closest('tr');
+        const index = parseInt(row.getAttribute('data-index'));
+        editDetailRow(index);
+      });
+    });
+  }
+
+  // 编辑明细行
+  // function editDetailRow(index) {
+  //   if (isViewMode) return;
+  //
+  //   // 如果有正在编辑的行，先结束编辑
+  //   if (editingRowIndex !== -1) {
+  //     endEdit();
+  //   }
+  //
+  //   editingRowIndex = index;
+  //   const detail = orderDetails[index];
+  //   const row = document.querySelector(`tr[data-index="${index}"]`);
+  //
+  //   // 创建编辑表单
+  //   const numCell = row.children[3];
+  //   const priceCell = row.children[4];
+  //
+  //   // 替换为输入框
+  //   numCell.innerHTML = `<input type="number" class="form-control" id="edit-num" value="${detail.num || 0}" min="0">`;
+  //   priceCell.innerHTML = `<input type="number" class="form-control" id="edit-price" value="${detail.price || 0}" min="0" step="0.01">`;
+  //
+  //   // 替换操作按钮
+  //   const actionCell = row.children[6];
+  //   actionCell.innerHTML = `
+  //     <div class="btn-group">
+  //       <button class="btn btn-success save-btn">保存</button>
+  //       <button class="btn btn-outline cancel-btn">取消</button>
+  //     </div>
+  //   `;
+  //
+  //   // 添加保存和取消事件
+  //   actionCell.querySelector('.save-btn').addEventListener('click', saveEdit);
+  //   actionCell.querySelector('.cancel-btn').addEventListener('click', cancelEdit);
+  // }
+  // 修改editDetailRow函数，使价格字段为只读
+  function editDetailRow(index) {
+    if (isViewMode) return;
+    // 如果有正在编辑的行，先结束编辑
+    if (editingRowIndex !== -1) {
+      endEdit();
+    }
+    editingRowIndex = index;
+    const detail = orderDetails[index];
+    const row = document.querySelector(`tr[data-index="${index}"]`);
+    // 创建编辑表单
+    const numCell = row.children[3];
+    const priceCell = row.children[4];
+    // 替换为输入框，价格为只读
+    numCell.innerHTML = `<input type="number" class="form-control" id="edit-num" value="${detail.num || 0}" min="0">`;
+    priceCell.innerHTML = `<input type="number" class="form-control" id="edit-price" value="${detail.price || 0}" readonly style="background-color: var(--bg-light);">`;
+    // 替换操作按钮
+    const actionCell = row.children[6];
+    actionCell.innerHTML = `
+    <div class="btn-group">
+      <button class="btn btn-success save-btn">保存</button>
+      <button class="btn btn-outline cancel-btn">取消</button>
+    </div>
+  `;
+    // 添加保存和取消事件
+    actionCell.querySelector('.save-btn').addEventListener('click', saveEdit);
+    actionCell.querySelector('.cancel-btn').addEventListener('click', cancelEdit);
+  }
+  // 修改saveEdit函数，只保存数量而不保存价格
+  function saveEdit() {
+    if (editingRowIndex === -1) return;
+    const detail = orderDetails[editingRowIndex];
+    const newNum = document.getElementById('edit-num').value;
+    // 不再获取价格输入，因为它是只读的
+    // const newPrice = document.getElementById('edit-price').value;
+    // 验证输入
+    if (!newNum || isNaN(newNum) || parseInt(newNum) < 0) {
+      showToast('请输入有效的销售数量', 'danger');
+      return;
+    }
+    // 更新数据，只更新数量
+    const oldDetail = {...detail};
+    detail.num = parseInt(newNum);
+    // 不更新价格
+    // detail.price = parseFloat(newPrice);
+    // 记录更新
+    const found = updatedRows.findIndex(item => item.id === detail.id);
+    if (found >= 0) {
+      updatedRows[found] = detail;
+    } else {
+      updatedRows.push(detail);
+    }
+    // 结束编辑
+    endEdit();
+    showToast('明细更新成功', 'success');
+  }
+
+  // 保存编辑
+  // function saveEdit() {
+  //   if (editingRowIndex === -1) return;
+  //
+  //   const detail = orderDetails[editingRowIndex];
+  //   const newNum = document.getElementById('edit-num').value;
+  //   const newPrice = document.getElementById('edit-price').value;
+  //
+  //   // 验证输入
+  //   if (!newNum || isNaN(newNum) || parseInt(newNum) < 0) {
+  //     showToast('请输入有效的销售数量', 'danger');
+  //     return;
+  //   }
+  //
+  //   if (!newPrice || isNaN(newPrice) || parseFloat(newPrice) < 0) {
+  //     showToast('请输入有效的销售价格', 'danger');
+  //     return;
+  //   }
+  //
+  //   // 更新数据
+  //   const oldDetail = {...detail};
+  //   detail.num = parseInt(newNum);
+  //   detail.price = parseFloat(newPrice);
+  //
+  //   // 记录更新
+  //   const found = updatedRows.findIndex(item => item.id === detail.id);
+  //   if (found >= 0) {
+  //     updatedRows[found] = detail;
+  //   } else {
+  //     updatedRows.push(detail);
+  //   }
+  //
+  //   // 结束编辑
+  //   endEdit();
+  //   showToast('明细更新成功', 'success');
+  // }
+
+  // 取消编辑
+  function cancelEdit() {
+    endEdit();
+  }
+
+  // 结束编辑
+  function endEdit() {
+    if (editingRowIndex === -1) return;
+
+    renderOrderDetails(); // 重新渲染表格
+    editingRowIndex = -1;
+  }
+
+  // 打开图书选择模态框
+  function openGoodsModal() {
+    document.getElementById('goodsSearch').value = '';
+    document.getElementById('goodsTableBody').innerHTML = '';
+    tempSelectedGoods = null;
+
+    document.getElementById('goodsModalBackdrop').style.display = 'block';
+    document.getElementById('goodsModal').style.display = 'block';
+
+    // 加载初始图书数据
+    loadGoods('');
+  }
+
+  // 关闭图书选择模态框
+  function closeGoodsModal() {
+    document.getElementById('goodsModalBackdrop').style.display = 'none';
+    document.getElementById('goodsModal').style.display = 'none';
+  }
+
+  // 加载图书数据
+  function loadGoods(query) {
+    const url = query
+            ? `${httphost}/goods/getGoods?sname=${encodeURIComponent(query)}`
+            : `${httphost}/goods/getGoods`;
+
+    fetch(url)
+            .then(response => response.json())
+            .then(data => {
+              const goods = data.rows || data;
+              renderGoodsTable(goods);
+            })
+            .catch(error => {
+              console.error('获取图书数据失败:', error);
+              document.getElementById('goodsTableBody').innerHTML = '<tr><td colspan="4" class="text-muted" style="text-align: center;">加载失败，请重试</td></tr>';
+            });
+  }
+
+  // 搜索图书
+  function searchGoods(query) {
+    loadGoods(query);
+  }
+
+  // 渲染图书表格
+  function renderGoodsTable(goods) {
+    const tbody = document.getElementById('goodsTableBody');
+    tbody.innerHTML = '';
+
+    if (!goods || goods.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" class="text-muted" style="text-align: center;">暂无图书数据</td></tr>';
+      return;
+    }
+
+    goods.forEach(item => {
+      const row = document.createElement('tr');
+      row.setAttribute('data-id', item.id);
+
+      // 添加点击事件
+      row.addEventListener('click', function() {
+        // 移除之前选中的行样式
+        document.querySelectorAll('#goodsTableBody tr.table-row-selected').forEach(row => {
+          row.classList.remove('table-row-selected');
+        });
+
+        // 添加选中样式
+        this.classList.add('table-row-selected');
+
+        // 保存选中的图书
+        tempSelectedGoods = item;
+      });
+
+      // 图书编号
+      const snoCell = document.createElement('td');
+      snoCell.textContent = item.sno || '';
+
+      // 图书名称
+      const nameCell = document.createElement('td');
+      nameCell.textContent = item.sname || '';
+
+      // 图书类别
+      const typeCell = document.createElement('td');
+      typeCell.textContent = item.goodType || '';
+
+      // 参考价格
+      const priceCell = document.createElement('td');
+      priceCell.textContent = item.addition || '';
+
+      row.appendChild(snoCell);
+      row.appendChild(nameCell);
+      row.appendChild(typeCell);
+      row.appendChild(priceCell);
+
+      tbody.appendChild(row);
+    });
+  }
+
+  // 添加新行
+  // function addNewRow(goods) {
+  //   // 创建新的订单明细对象
+  //   const newDetail = {
+  //     id: `new_${Date.now()}`, // 临时ID
+  //     goodsPid: goods.id,
+  //     goodsName: goods.sname,
+  //     goodsTypeName: goods.goodType,
+  //     num: 1,
+  //     price: parseFloat(goods.addition) || 0,
+  //     alreadyNum: 0,
+  //     salePid: id || null
+  //   };
+  //
+  //   // 添加到列表和插入记录
+  //   orderDetails.push(newDetail);
+  //   insertedRows.push(newDetail);
+  //
+  //   // 重新渲染表格
+  //   renderOrderDetails();
+  //   showToast('新增图书成功', 'success');
+  // }
+  // 修改addNewRow函数，确保显示正确的价格信息
+  function addNewRow(goods) {
+    // 创建新的订单明细对象
+    const newDetail = {
+      id: `new_${Date.now()}`, // 临时ID
+      goodsPid: goods.id,
+      goodsName: goods.sname,
+      goodsTypeName: goods.goodType,
+      num: 1,
+      price: parseFloat(goods.addition) || 0,
+      alreadyNum: 0,
+      salePid: id || null
+    };
+    // 添加到列表和插入记录
+    orderDetails.push(newDetail);
+    insertedRows.push(newDetail);
+    // 重新渲染表格
+    renderOrderDetails();
+    showToast('新增图书成功', 'success');
+  }
+
+  // 删除选中行
+  function deleteSelectedRows() {
+    const selected = document.querySelectorAll('.item-checkbox:checked');
+
+    if (selected.length === 0) {
+      showToast('请选择要删除的行', 'danger');
+      return;
+    }
+
+    if (confirm(`确定要删除选中的 ${selected.length} 项吗？`)) {
+      selected.forEach(checkbox => {
+        const row = checkbox.closest('tr');
+        const index = parseInt(row.getAttribute('data-index'));
+        const detail = orderDetails[index];
+
+        // 如果是已有的记录，加入删除列表
+        if (detail.id && !detail.id.toString().startsWith('new_')) {
+          deletedRows.push(detail);
+        }
+
+        // 从插入列表中移除
+        const insertIndex = insertedRows.findIndex(item => item.id === detail.id);
+        if (insertIndex >= 0) {
+          insertedRows.splice(insertIndex, 1);
+        }
+
+        // 从更新列表中移除
+        const updateIndex = updatedRows.findIndex(item => item.id === detail.id);
+        if (updateIndex >= 0) {
+          updatedRows.splice(updateIndex, 1);
+        }
+      });
+
+      // 从详情列表中移除所有选中的行
+      const newDetails = [];
+      orderDetails.forEach((detail, index) => {
+        const isChecked = document.querySelector(`#select-${detail.id}`);
+        if (!isChecked || !isChecked.checked) {
+          newDetails.push(detail);
+        }
+      });
+
+      orderDetails = newDetails;
+      renderOrderDetails();
+      showToast('删除成功', 'success');
+    }
+  }
+
+  // 提交订单
+  function submitOrder() {
+    // 验证必填字段
+    // const cangPid = document.getElementById('cangPid-id').value;
+    // const yuanPid = document.getElementById('yuanPid-id').value;
+    const guPid = document.getElementById('guPid-id').value;
+    // const dueDate = document.getElementById('dueDate').value;
+
+    // if (!cangPid) {
+    //   showToast('请选择发货仓库', 'danger');
+    //   return;
+    // }
+    //
+    // if (!yuanPid) {
+    //   showToast('请选择员工', 'danger');
+    //   return;
+    // }
+
+    if (!guPid) {
+      showToast('请选择顾客', 'danger');
+      return;
+    }
+
+    // if (!dueDate) {
+    //   showToast('请选择销售日期', 'danger');
+    //   return;
+    // }
+
+    // 验证是否有订单明细
+    if (orderDetails.length === 0) {
+      showToast('请至少添加一项订单明细', 'danger');
+      return;
+    }
+
+    // 构建提交数据
+    const saleDto = {
+      id: id || '',
+      sno: document.getElementById('sno').value,
+      // cangPid: cangPid,
+      // yuanPid: yuanPid,
+      guPid: guPid,
+      // dueDate: dueDate,
+      inserted: JSON.stringify(insertedRows),
+      updated: JSON.stringify(updatedRows),
+      deleted: JSON.stringify(deletedRows)
+    };
+
+    // 确认提交
+    if (confirm('确定要保存当前销售订单吗？')) {
+      showLoadingIndicator();
+
+      fetch(`${httphost}/sale/edit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(saleDto).toString()
+      })
+              .then(response => response.json())
+              .then(result => {
+                hideLoadingIndicator();
+
+                if (result.success) {
+                  showToast(result.msg, 'success');
+                  setTimeout(() => {
+                    window.close();
+                  }, 1500);
+                } else {
+                  showToast(result.msg, 'danger');
+                }
+              })
+              .catch(error => {
+                hideLoadingIndicator();
+                console.error('提交订单失败:', error);
+                showToast('提交订单失败，请重试', 'danger');
+              });
+    }
+  }
+
+  // 显示加载指示器
+  function showLoadingIndicator() {
+    // 创建加载指示器元素
+    if (!document.getElementById('loading-indicator')) {
+      const loadingDiv = document.createElement('div');
+      loadingDiv.id = 'loading-indicator';
+      loadingDiv.style.position = 'fixed';
+      loadingDiv.style.top = '0';
+      loadingDiv.style.left = '0';
+      loadingDiv.style.width = '100%';
+      loadingDiv.style.height = '100%';
+      loadingDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+      loadingDiv.style.display = 'flex';
+      loadingDiv.style.justifyContent = 'center';
+      loadingDiv.style.alignItems = 'center';
+      loadingDiv.style.zIndex = '2000';
+
+      const spinner = document.createElement('div');
+      spinner.style.width = '48px';
+      spinner.style.height = '48px';
+      spinner.style.border = '4px solid var(--primary-light)';
+      spinner.style.borderRadius = '50%';
+      spinner.style.borderTop = '4px solid var(--primary)';
+      spinner.style.animation = 'spin 1s linear infinite';
+
+      const style = document.createElement('style');
+      style.textContent = '@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }';
+
+      document.head.appendChild(style);
+      loadingDiv.appendChild(spinner);
+      document.body.appendChild(loadingDiv);
+    } else {
+      document.getElementById('loading-indicator').style.display = 'flex';
+    }
+  }
+
+  // 隐藏加载指示器
+  function hideLoadingIndicator() {
+    const loader = document.getElementById('loading-indicator');
+    if (loader) {
+      loader.style.display = 'none';
+    }
+  }
+
+  // 显示通知消息
+  function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+
+    // 创建通知元素
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+
+    // 添加到容器
+    container.appendChild(toast);
+
+    // 显示通知
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 10);
+
+    // 5秒后自动消失
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => {
+        container.removeChild(toast);
+      }, 300);
+    }, 5000);
+  }
+
+  // 禁用表单输入 (查看模式)
+  function disableFormInputs() {
+    // 禁用所有输入框
+    document.querySelectorAll('#orderForm input').forEach(input => {
+      input.setAttribute('readonly', true);
+    });
+
+    // 隐藏操作按钮
+    document.getElementById('addRowBtn').style.display = 'none';
+    document.getElementById('deleteSelectedBtn').style.display = 'none';
+
+    // 修改提交按钮文本
+    document.getElementById('submitBtn').textContent = '关闭';
+
+    // 隐藏取消按钮
+    document.getElementById('cancelBtn').style.display = 'none';
+  }
+</script>
+</body>
+</html>
+
