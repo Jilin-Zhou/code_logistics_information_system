@@ -25,6 +25,11 @@
     openSocket();
 
     $(function() {
+
+        $('#showCompletedOnly').on('change', function() {
+            filterCompletedOrders();
+        });
+
         $('#cangPid').combogrid({
             panelWidth:380,
             panelHeight:450,
@@ -375,6 +380,35 @@
         });
     }
 
+    function filterCompletedOrders() {
+        var showCompletedOnly = $('#showCompletedOnly').is(':checked');
+        var grid = $('#dataGrid');
+
+        if (showCompletedOnly) {
+            // 获取当前所有数据
+            var allData = grid.datagrid('getData');
+            var filteredRows = [];
+
+            // 筛选已完成的订单
+            for (var i = 0; i < allData.rows.length; i++) {
+                // 根据你的数据结构判断订单是否已完成
+                if (allData.rows[i].status === 'completed' || allData.rows[i].status === 1) {
+                    filteredRows.push(allData.rows[i]);
+                }
+            }
+
+            // 直接加载筛选后的数据，不请求后端
+            grid.datagrid('loadData', {
+                total: filteredRows.length,
+                rows: filteredRows
+            });
+        } else {
+            // 取消筛选，重新加载所有数据
+            grid.datagrid('reload');
+        }
+    }
+
+
 </script>
 </head>
 <body>
@@ -410,6 +444,10 @@
                            plain="false" onclick="doSearch()" iconCls="icon-search">查询</a>&nbsp;&nbsp;
                         <a href="javascript:void(0)" class="easyui-linkbutton"
                            plain="false" onclick="clearSearch()" iconCls="icon-redo">清空</a>&nbsp;&nbsp;
+                    </td>
+                    <td>
+                        <input type="checkbox" id="showCompletedOnly" />
+                        <label for="showCompletedOnly">只显示已完成订单</label>
                     </td>
                 </tr>
                 <tr>
